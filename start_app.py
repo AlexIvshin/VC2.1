@@ -127,13 +127,13 @@ def thread_monitoring():
         if not thread.is_alive():
             AppWidget.close_widget()
         else:
-            sysmonitor.sys_monitoring()  # Слежка за системой
+            sysmonitor.sys_monitoring()  # Слежка за системой.
             time.sleep(10)
 
 
 model = Assistant()
-thread = Thread(target=model.listening)  # Создаём главный поток
-is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком
+thread = Thread(target=model.listening)  # Создаём главный поток.
+is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком.
 
 
 def main():
@@ -143,9 +143,9 @@ def main():
     widget = AppWidget.root
 
     # noinspection PyTypeChecker
-    with redirect_stdout(TextWrapper(text, label, info_label)):  # Перенаправляем весь STDOUT в tkinter
-        thread.start()  # Запускаем главный поток
-        is_alive_thread.start()  # Запускаем поток слежки за главным потоком
+    with redirect_stdout(TextWrapper(text, label, info_label)):  # Перенаправляем весь STDOUT в tkinter.
+        thread.start()  # Запускаем главный поток.
+        is_alive_thread.start()  # Запускаем поток слежки за главным потоком.
 
         widget.protocol('WM_DELETE_WINDOW', widget.destroy)
         widget.mainloop()
