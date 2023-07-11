@@ -951,13 +951,25 @@ class Anonimizer:
     def tor_check() -> bool:
         path_tor = '/usr/sbin/tor'
         path_toriptables2 = '/usr/local/bin/toriptables2.py'
+        path_python2 = '/usr/bin/python2'
 
         if not os.path.isfile(path_tor):
             talk('Тор в системе не обнаружен!')
+            print('Для установки Tor выполнить: sudo apt-get install tor')
             return False
 
         if not os.path.isfile(path_toriptables2):
             talk('Тор-айпи-тэйбл в системе не обнаружен!')
+            print('Для установки toriptables2 выполнить:')
+            print('git clone https://github.com/ruped24/toriptables2')
+            print('cd toriptables2/')
+            print('sudo mv toriptables2.py /usr/local/bin/')
+            print('cd')
+            return False
+
+        if not os.path.isfile(path_python2):
+            talk('Для работы скрипта необходим пайтон2!')
+            print('sudo apt install python2')
             return False
 
         return True
@@ -968,15 +980,17 @@ class Anonimizer:
 
         if self.on_off == 'on':
             ipaddress = self.get_ip()
+            print(f'Мой IP: {ipaddress}')
             tls.answer_ok_and_pass(enter_pass=True)
             run(f'{XTERM_s} sudo toriptables2.py -l', shell=True)
             new_ipaddress = self.get_ip()
+            print(f'Мой новый IP: {new_ipaddress}')
             return talk('Упс! Не вышло') if ipaddress == new_ipaddress else talk(random.choice(dg.done))
 
         if self.on_off == 'off':
             tls.answer_ok_and_pass(enter_pass=True)
             run(f'{XTERM_s} sudo toriptables2.py -f', shell=True)
-            print(self.get_ip())
+            print(f'Мой IP: {self.get_ip()}')
             return talk(random.choice(dg.done))
 
 
@@ -986,7 +1000,7 @@ class FileLife:
 
     @staticmethod
     def file_name_assignment(path, name=None):
-        print(path)
+        print(f'"{path}"')
         while True:
             if name:
                 file_name = name
@@ -1037,6 +1051,7 @@ class FileLife:
             for word in dg.notebook_action_dict['create_memo_file']:
                 if word in split_commandline:
                     indexes.append(split_commandline.index(word))
+
             index_keyword = max(indexes)
             memo_data = ' '.join(split_commandline[index_keyword + 1:])
 

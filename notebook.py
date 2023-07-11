@@ -67,7 +67,13 @@ def file_existence(function):
         if not file:
             return choice_file()
         function()
-        stack.clear_stack() if function != 'delete_file' else None
+    return wrapper
+
+
+def file_existence_and_clear_stack(function):
+    def wrapper():
+        file_existence(function)
+        stack.clear_stack()
     return wrapper
 
 
@@ -105,7 +111,7 @@ def rename_file():
     file_action.rename_file(file)
 
 
-@file_existence
+@file_existence_and_clear_stack
 def delete_file():
     file_action.delete_file(file)
 
