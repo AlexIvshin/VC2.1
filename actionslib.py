@@ -10,20 +10,9 @@ from assistant import Assistant
 
 model = Assistant()
 talk = model.speaks
-# mic_sins = model.mic_sensitivity
 
 homedir = os.getcwdb().decode(encoding='utf-8')
 scriptdir: str = f'{homedir}/scripts/'
-xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 93x25+340+300 '
-                   f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
-xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 77x15+405+300 '
-                   f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
-xterm_options_info = (f'-fg "#6666ff" -bg "#00091a" -geometry 65x47+900+10 '
-                      f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
-
-XTERM_b = f'xterm {xterm_options_b} -e'  # Большое окно терминала XTERM
-XTERM_s = f'xterm {xterm_options_s} -e'  # Маленькое окно терминала XTERM
-XTERM_info = f'xterm {xterm_options_info} -hold -e'  # Окно терминала XTERM для вывода информации о системе
 
 last_function = ''
 last_cmdline = ''
@@ -149,11 +138,15 @@ def random_joke():
 
 
 def show_sys_info():
+    xterm_options_info = (f'-fg "#6666ff" -bg "#00091a" -geometry 70x60+20+20 '
+                          f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
+    xterm_info = f'xterm {xterm_options_info} -hold -e'  # Окно терминала XTERM для вывода информации о системе
+
     if max_intersection_val < 3:
         return
     tls.answer_ok_and_pass()
     puth = f'{homedir}/skills.py'
-    run(f'{XTERM_info} python3 {puth} &', shell=True)
+    run(f'{xterm_info} python3 {puth} &', shell=True)
 
 
 def exchange_rates():

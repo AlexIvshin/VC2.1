@@ -33,9 +33,17 @@ talk = model.speaks
 mic_sins = model.mic_sensitivity
 
 homedir = os.getcwdb().decode(encoding='utf-8')
-xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 93x25+340+300 '
+
+
+def get_x_position(geom_w):
+    displaysize_x = 1980
+    return int((displaysize_x - geom_w * 8) / 2) + 8
+
+
+xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 99x30+{get_x_position(98)}+350 '
                    f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
-xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 77x15+405+300 '
+
+xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 98x15+{get_x_position(98)}+350 '
                    f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
 XTERM_b = f'xterm {xterm_options_b} -e'  # Большое окно терминала XTERM
@@ -142,10 +150,8 @@ class Calculator:
 
 class SearchEngine:
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
-    XTERM_options = (
-        f'-fg "#8787ff" -bg "#06090f" -geometry 120x30+250+280 '
-        f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1'
-    )
+    XTERM_options = (f'-fg "#8787ff" -bg "#06090f" -geometry 120x30+{get_x_position(98)}+350 '
+                     f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
     def __init__(self, commandline, action, intersection):
         self.commandline = commandline

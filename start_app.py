@@ -72,11 +72,17 @@ class TextWrapper:
 
 class AppWidget:
     root = tk.Tk()
+    displaysize_x = root.winfo_screenwidth()
+    w = 700
+    h = 327
+    x = int((displaysize_x - w) / 2)
+    y = 20
+    root.geometry(f"{w}x{h}+{x}+{y}")
     root.title('VCom 2.1')
-    root.geometry("700x327+660+20")
     root.resizable(False, False)
     root.wait_visibility(root)
     root.wm_attributes("-alpha", 0.8)
+    # root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     label = tk.Label(root,
                      text='VCom 2.1',
