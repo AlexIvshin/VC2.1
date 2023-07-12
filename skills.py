@@ -36,8 +36,7 @@ homedir = os.getcwdb().decode(encoding='utf-8')
 
 
 def xterm_x_position(geom_w):
-    displaysize_x = tls.get_displaysize()[0]
-    return int((displaysize_x - geom_w * 8) / 2) + 8
+    return int((tls.get_displaysize()[0] - geom_w * 8) / 2) + 8
 
 
 xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 99x30+{xterm_x_position(98)}+350 '
