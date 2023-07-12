@@ -138,7 +138,7 @@ def random_joke():
 
 
 def show_sys_info():
-    xterm_options_info = (f'-fg "#6666ff" -bg "#00091a" -geometry 70x60+20+20 '
+    xterm_options_info = (f'-fg "#8787ff" -bg "#06090f" -geometry 70x60+20+20 '
                           f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
     xterm_info = f'xterm {xterm_options_info} -hold -e'  # Окно терминала XTERM для вывода информации о системе
 

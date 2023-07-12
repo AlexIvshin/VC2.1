@@ -35,15 +35,15 @@ mic_sins = model.mic_sensitivity
 homedir = os.getcwdb().decode(encoding='utf-8')
 
 
-def get_x_position(geom_w):
-    displaysize_x = 1980
+def xterm_x_position(geom_w):
+    displaysize_x = tls.get_displaysize()[0]
     return int((displaysize_x - geom_w * 8) / 2) + 8
 
 
-xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 99x30+{get_x_position(98)}+350 '
+xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 99x30+{xterm_x_position(98)}+350 '
                    f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
-xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 98x15+{get_x_position(98)}+350 '
+xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 98x15+{xterm_x_position(98)}+350 '
                    f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
 XTERM_b = f'xterm {xterm_options_b} -e'  # Большое окно терминала XTERM
@@ -150,7 +150,7 @@ class Calculator:
 
 class SearchEngine:
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
-    XTERM_options = (f'-fg "#8787ff" -bg "#06090f" -geometry 120x30+{get_x_position(98)}+350 '
+    XTERM_options = (f'-fg "#8787ff" -bg "#06090f" -geometry 120x30+{xterm_x_position(98)}+350 '
                      f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
     def __init__(self, commandline, action, intersection):
@@ -368,7 +368,6 @@ class Sinoptik:
                 return
 
             r = requests.get(url_weather_city)
-
             if r.status_code != 200:
                 print(f'Status code: {r.status_code} !!!')
                 talk('Упс! Целевой сервер не отвечает.')
@@ -434,7 +433,6 @@ class Polyhistor:
         url_joke = 'https://www.anekdot.ru/random/anekdot/'
 
         r = requests.get(url_joke)
-
         if r.status_code != 200:
             print('Status code: ', r.status_code)
             return talk('Упс! Целевой сервер не отвечает.')
@@ -667,7 +665,7 @@ class Translators:
 
 class SysInformer:
     @classmethod
-    def correct_size(cls, bts, ending='iB'):
+    def correct_size(cls, bts, ending='iB') -> str:
         _size = 1024
 
         for item in ["", "K", "M", "G", "T", "P"]:
@@ -908,7 +906,7 @@ class ScriptStarter:
         self.script_key = script_key
         self.intersection = intersection
 
-    def get_script(self):
+    def get_script(self) -> tuple[str, str]:
         script = None
         script_name = ''.join(self.script_key.split('_')[-1])
 
@@ -954,7 +952,7 @@ class Anonimizer:
             talk('Похоже проблемы с интернетом!')
 
     @staticmethod
-    def tor_check() -> bool:
+    def component_check() -> bool:
         path_tor = '/usr/sbin/tor'
         path_toriptables2 = '/usr/local/bin/toriptables2.py'
         path_python2 = '/usr/bin/python2'
@@ -981,7 +979,7 @@ class Anonimizer:
         return True
 
     def start_stop_anonimizer(self):
-        if self.intersection < 2 or not self.tor_check() or not tls.check_internet():
+        if self.intersection < 2 or not self.component_check() or not tls.check_internet():
             return
 
         if self.on_off == 'on':
@@ -1005,7 +1003,7 @@ class FileLife:
     note_dir = os.path.abspath('notebook')
 
     @staticmethod
-    def file_name_assignment(path, name=None):
+    def file_name_assignment(path, name=None) -> str:
         print(f'"{path}"')
         while True:
             if name:
@@ -1028,7 +1026,6 @@ class FileLife:
         [print(line, end='') for line in f]
         print()
         f.close()
-        return True
 
     def create_file(self, name=None, data=None):
         file_name = self.file_name_assignment(self.note_dir, name)
@@ -1037,7 +1034,6 @@ class FileLife:
         if data:
             file.write(str(data))
         file.close()
-        return True
 
     def rename_file(self, old_name):
         new_file_name = self.file_name_assignment(self.note_dir)
@@ -1045,7 +1041,6 @@ class FileLife:
         new_file = os.path.join(self.note_dir, new_file_name)
         tls.answer_ok_and_pass()
         os.rename(old_file, new_file)
-        return True
 
     def create_memo_file(self, commandline):
         if tls.check_hand_input(commandline):
@@ -1072,18 +1067,15 @@ class FileLife:
         if self.create_file(file_name, memo_data):
             talk('Мемо-файл создан!')
             print(file_name)
-            return True
 
     def edit_file(self, file):
         tls.answer_ok_and_pass()
         run(f'kate {self.note_dir}/{file} &', shell=True)
-        return True
 
     def delete_file(self, file, permission=False):
         if permission:
             os.remove(f'{self.note_dir}/{file}')
             talk(random.choice(dg.done))
-            return True
         else:
             talk(f'Действительно удалить файл?')
             print(f'"{file}"')

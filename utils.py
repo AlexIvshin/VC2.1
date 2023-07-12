@@ -1,5 +1,6 @@
 import random
 import requests
+from subprocess import check_output
 import sys
 import os
 from bs4 import BeautifulSoup
@@ -24,17 +25,24 @@ reverse_cmd = 'реверс'
 wakeup_cmd = 'первая проснись'
 
 
+def get_displaysize() -> tuple[int, int]:
+    size = check_output(f'''xrandr | grep 'Screen 0:' | awk -F ',' '{{print $2}}' | awk '{{print $2, $4}}' ''',
+                        encoding='utf-8', shell=True)
+    displaysize_x, displaysize_y = int(size.split()[0]), int(size.split()[1])
+    return displaysize_x, displaysize_y
+
+
 def restart_app():
     talk('Перезагружаюсь!')  # Ключевая фраза которая ловится в start_app.py
     sys.exit()
 
 
-def check_yesno_onoff(command, dictionary: dict):
+def check_yesno_onoff(command, dictionary: dict) -> str:
     command_word = set(command.split(' '))
     return ''.join([key for key, value in dictionary.items() if set(value).intersection(command_word)])
 
 
-def check_hand_input(words):
+def check_hand_input(words) -> bool:
     input_words = ['ручной', 'клавиатура', 'клавиатуры', 'ввод', 'вот', 'ручную']
 
     if len(set(words.split(' ')).intersection(set(input_words))) > 1:
@@ -42,7 +50,7 @@ def check_hand_input(words):
         return True
 
 
-def choice_action(command, actions_dict):
+def choice_action(command, actions_dict) -> tuple:
     command_word = set(command.split(' '))
     max_intersection: int = 0
     action = None
@@ -59,12 +67,12 @@ def choice_action(command, actions_dict):
         return None, None
 
 
-def check_prg(command):
+def check_prg(command) -> str:
     command_word = set(command.split(' '))
     return ''.join([key for key, value in dg.programs_dict.items() if set(value).intersection(command_word)])
 
 
-def check_word_sequence(command, words):
+def check_word_sequence(command, words) -> bool:
     indexes_words: list = []
     [indexes_words.append(command.split(' ').index(i)) for i in words]  # список индексов слов вхождения
     indexes_words.sort()  # сортируем список
@@ -77,14 +85,14 @@ def check_word_sequence(command, words):
     return True
 
 
-def answer_ok_and_pass(answer=True, enter_pass=False):
+def answer_ok_and_pass(answer=True, enter_pass=False) -> None:
     if answer:
         talk(random.choice(dg.answer_ok))
     if enter_pass:
         talk(random.choice(dg.enter_pass_answer))
 
 
-def get_intersection_word(action, command, dictionary: dict):
+def get_intersection_word(action, command, dictionary: dict) -> list:
     intersection_words = []
 
     for word in command.split(' '):
@@ -94,7 +102,7 @@ def get_intersection_word(action, command, dictionary: dict):
     return intersection_words
 
 
-def get_meat(action, command, dictionary: dict):
+def get_meat(action, command, dictionary: dict) -> str:
     command_words = command.split(' ')
     keywords = get_intersection_word(action, command, dictionary)
     keyword = keywords[-1]
@@ -103,7 +111,7 @@ def get_meat(action, command, dictionary: dict):
     return meat
 
 
-def get_ip():
+def get_ip() -> str:
     try:
         url = "https://pr-cy.ru/browser-details/"
         r = requests.get(url)
@@ -129,7 +137,7 @@ def get_ip():
         pass
 
 
-def check_internet():  # internet check feature
+def check_internet() -> bool:  # internet check feature
     import socket
 
     host = '8.8.8.8'
@@ -148,7 +156,7 @@ def check_internet():  # internet check feature
         return False
 
 
-def choice_mode(change_mode_cmd, var_mode='default'):
+def choice_mode(change_mode_cmd, var_mode='default') -> str:
     mode = var_mode
 
     if mode != sleep_mode and change_mode_cmd == notebook_cmd \

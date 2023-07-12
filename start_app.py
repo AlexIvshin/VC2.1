@@ -74,15 +74,13 @@ class AppWidget:
     root = tk.Tk()
     displaysize_x = root.winfo_screenwidth()
     w = 700
-    h = 327
     x = int((displaysize_x - w) / 2)
-    y = 20
-    root.geometry(f"{w}x{h}+{x}+{y}")
+    root.geometry(f"{w}x327+{x}+20")
     root.title('VCom 2.1')
     root.resizable(False, False)
     root.wait_visibility(root)
     root.wm_attributes("-alpha", 0.8)
-    # root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+    root.configure(border=2)
 
     label = tk.Label(root,
                      text='VCom 2.1',
@@ -96,8 +94,8 @@ class AppWidget:
     text = tk.Text(root,
                    height=17,
                    border=0,
-                   background='#121721',
-                   selectbackground='black',
+                   background='#000000',
+                   selectbackground='#090c10',
                    highlightthickness=0,
                    insertwidth=0,
                    font='Hack 10',
