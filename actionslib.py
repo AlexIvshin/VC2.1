@@ -138,15 +138,11 @@ def random_joke():
 
 
 def show_sys_info():
-    xterm_options_info = (f'-fg "#8787ff" -bg "#06090f" -geometry 65x50+10+20 '
-                          f'-fa fixed -fs 11')
-    xterm_info = f'xterm {xterm_options_info} -hold -e'  # Окно терминала XTERM для вывода информации о системе
-
     if max_intersection_val < 3:
         return
     tls.answer_ok_and_pass()
     puth = f'{homedir}/skills.py'
-    run(f'{xterm_info} python3 {puth} &', shell=True)
+    run(f'{tls.choice_xterm("XtermInfo")} python3 {puth} &', shell=True)
 
 
 def exchange_rates():

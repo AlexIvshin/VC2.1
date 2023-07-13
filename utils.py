@@ -32,6 +32,42 @@ def get_displaysize() -> tuple[int, int]:
     return displaysize_x, displaysize_y
 
 
+def xterm_x_position(geom_w: int) -> int:
+    return int((get_displaysize()[0] - geom_w * 10) / 2)
+
+
+def choice_xterm(category):
+    import configparser
+    import pathlib
+
+    config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    category_list = ['Xterm', 'XtermSmall', 'XtermInfo', 'XtermSearch']
+
+    if category not in category_list:
+        return
+
+    x = int(config[category]['x'])
+    y = int(config[category]['y'])
+    fg = config[category]['fg']
+    bg = config[category]['bg']
+    fontsize = int(config[category]['fontsize'])
+    title = category
+    pos_x = xterm_x_position(x)
+    pos_y = 350
+    hold = ''
+
+    if category == 'XtermInfo':
+        pos_x = 10
+        pos_y = 20
+
+    if category in category_list[2:]:
+        hold = '-hold'
+
+    return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
+
+
 def restart_app():
     talk('Перезагружаюсь!')  # Ключевая фраза которая ловится в start_app.py
     sys.exit()

@@ -35,20 +35,6 @@ mic_sins = model.mic_sensitivity
 homedir = os.getcwdb().decode(encoding='utf-8')
 
 
-def xterm_x_position(geom_w):
-    return int((tls.get_displaysize()[0] - geom_w * 10) / 2)
-
-
-xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 69x30+{xterm_x_position(70)}+350 '
-                   f'-fa fixed -fs 12')
-
-xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 69x15+{xterm_x_position(70)}+350 '
-                   f'-fa fixed -fs 12')
-
-XTERM_b = f'xterm {xterm_options_b} -e'  # Большое окно терминала XTERM
-XTERM_s = f'xterm {xterm_options_s} -e'  # Маленькое окно терминала XTERM
-
-
 class ProgramManager:
 
     def __init__(self, program, action):
@@ -149,8 +135,6 @@ class Calculator:
 
 class SearchEngine:
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
-    XTERM_options = (f'-fg "#8787ff" -bg "#06090f" -geometry 120x30+{xterm_x_position(98)}+350 '
-                     f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
 
     def __init__(self, commandline, action, intersection):
         self.commandline = commandline
@@ -229,7 +213,7 @@ class SearchEngine:
             page = wikipedia.page(result[0])
             title = page.title
             content = page.content
-            run(f'xterm {cls.XTERM_options} -hold -e echo "{title}{content}" &', shell=True)
+            run(f'{tls.choice_xterm("XtermSearch")} echo "{title}{content}" &', shell=True)
             talk('Это всё, что удалось найти!')
 
         except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError):
@@ -911,9 +895,9 @@ class ScriptStarter:
 
         if script_name == 'nmstart' and self.intersection == 3 \
                 or script_name == 'cleancashe' and self.intersection == 2:
-            script = f'{XTERM_s} sudo {self.scriptdir}./{script_name}.sh'
+            script = f'{tls.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh'
         elif script_name == 'sysfullupgrade' and self.intersection == 2:
-            script = f'{XTERM_b} sudo {self.scriptdir}./{script_name}.sh'
+            script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh'
 
         return script, script_name
 
@@ -985,14 +969,14 @@ class Anonimizer:
             ipaddress = self.get_ip()
             print(f'Мой IP: {ipaddress}')
             tls.answer_ok_and_pass(enter_pass=True)
-            run(f'{XTERM_s} sudo toriptables2.py -l', shell=True)
+            run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -l', shell=True)
             new_ipaddress = self.get_ip()
             print(f'Мой новый IP: {new_ipaddress}')
             return talk('Упс! Не вышло') if ipaddress == new_ipaddress else talk(random.choice(dg.done))
 
         if self.on_off == 'off':
             tls.answer_ok_and_pass(enter_pass=True)
-            run(f'{XTERM_s} sudo toriptables2.py -f', shell=True)
+            run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -f', shell=True)
             print(f'Мой IP: {self.get_ip()}')
             return talk(random.choice(dg.done))
 
