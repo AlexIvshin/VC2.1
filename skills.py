@@ -898,7 +898,6 @@ class ScriptStarter:
             script = f'{tls.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh'
         elif script_name == 'sysfullupgrade' and self.intersection == 2:
             script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh'
-
         return script, script_name
 
     def run_script(self):

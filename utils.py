@@ -36,7 +36,7 @@ def xterm_x_position(geom_w: int) -> int:
     return int((get_displaysize()[0] - geom_w * 10) / 2)
 
 
-def choice_xterm(category):
+def choice_xterm(category) -> str:
     import configparser
     import pathlib
 
@@ -46,7 +46,7 @@ def choice_xterm(category):
     category_list = ['Xterm', 'XtermSmall', 'XtermInfo', 'XtermSearch']
 
     if category not in category_list:
-        return
+        raise NameError('Функция принимает только один из зтих аргументов: [Xterm, XtermSmall, XtermInfo, XtermSearch]')
 
     x = int(config[category]['x'])
     y = int(config[category]['y'])
@@ -64,7 +64,6 @@ def choice_xterm(category):
 
     if category in category_list[2:]:
         hold = '-hold'
-
     return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
 
 
