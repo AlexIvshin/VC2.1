@@ -126,13 +126,11 @@ class AppWidget:
 
 def thread_monitoring():
     sysmonitor = SysInformer()
-
     while True:
         if not thread.is_alive():
-            AppWidget.close_widget()
-        else:
-            sysmonitor.sys_monitoring()  # Слежка за системой.
-            time.sleep(10)
+            return AppWidget.close_widget()
+        sysmonitor.sys_monitoring()  # Слежка за системой.
+        time.sleep(10)
 
 
 model = Assistant()
@@ -150,7 +148,6 @@ def main():
     with redirect_stdout(TextWrapper(text, label, info_label)):  # Перенаправляем весь STDOUT в tkinter.
         thread.start()  # Запускаем главный поток.
         is_alive_thread.start()  # Запускаем поток слежки за главным потоком.
-
         widget.protocol('WM_DELETE_WINDOW', widget.destroy)
         widget.mainloop()
 

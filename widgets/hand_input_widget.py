@@ -54,6 +54,3 @@ def get_input(text=''):
     keyboard_input(text)
     print(input_text)
     return input_text
-
-
-get_input()

@@ -138,8 +138,8 @@ def random_joke():
 
 
 def show_sys_info():
-    xterm_options_info = (f'-fg "#8787ff" -bg "#06090f" -geometry 70x60+20+20 '
-                          f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
+    xterm_options_info = (f'-fg "#8787ff" -bg "#06090f" -geometry 65x50+10+20 '
+                          f'-fa fixed -fs 11')
     xterm_info = f'xterm {xterm_options_info} -hold -e'  # Окно терминала XTERM для вывода информации о системе
 
     if max_intersection_val < 3:

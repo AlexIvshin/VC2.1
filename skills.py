@@ -36,14 +36,14 @@ homedir = os.getcwdb().decode(encoding='utf-8')
 
 
 def xterm_x_position(geom_w):
-    return int((tls.get_displaysize()[0] - geom_w * 8) / 2) + 8
+    return int((tls.get_displaysize()[0] - geom_w * 10) / 2)
 
 
-xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 99x30+{xterm_x_position(98)}+350 '
-                   f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
+xterm_options_b = (f'-fg "#8787ff" -bg "#06090f" -geometry 69x30+{xterm_x_position(70)}+350 '
+                   f'-fa fixed -fs 12')
 
-xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 98x15+{xterm_x_position(98)}+350 '
-                   f'-fn -misc-fixed-medium-r-normal--14-130-75-75-c-70-iso10646-1')
+xterm_options_s = (f'-fg "#8787ff" -bg "#06090f" -geometry 69x15+{xterm_x_position(70)}+350 '
+                   f'-fa fixed -fs 12')
 
 XTERM_b = f'xterm {xterm_options_b} -e'  # Большое окно терминала XTERM
 XTERM_s = f'xterm {xterm_options_s} -e'  # Маленькое окно терминала XTERM
