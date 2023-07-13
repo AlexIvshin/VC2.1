@@ -14,9 +14,11 @@ def keyboard_input(entry_text=''):
     input_window = tk.Tk()
     displaysize_x = input_window.winfo_screenwidth()
     w = 700
+    h = 35
+    y = 350
     x = int((displaysize_x - w) / 2)
+    input_window.geometry(f"{w}x{h}+{x}+{y}")
     input_window.title('hand input')
-    input_window.geometry(f"{w}x35+{x}+350")
     input_window.resizable(False, False)
     input_window.configure(border=0, background='#121721')
     input_window.wait_visibility(input_window)

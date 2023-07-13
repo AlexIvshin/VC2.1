@@ -10,6 +10,13 @@ import time
 from assistant import Assistant
 from skills import SysInformer
 
+import configparser
+import pathlib
+
+config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
+config = configparser.ConfigParser()
+config.read(config_path)
+
 
 class TextWrapper:
 
@@ -73,9 +80,10 @@ class TextWrapper:
 class AppWidget:
     root = tk.Tk()
     displaysize_x = root.winfo_screenwidth()
-    w = 700
+    w = int(config['WidgetSize']['width'])
+    h = int(config['WidgetSize']['height'])
     x = int((displaysize_x - w) / 2)
-    root.geometry(f"{w}x327+{x}+20")
+    root.geometry(f"{w}x{h}+{x}+20")
     root.title('VCom 2.1')
     root.resizable(False, False)
     root.wait_visibility(root)
