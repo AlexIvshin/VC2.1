@@ -113,10 +113,18 @@ def sys_down():
 
 
 def sys_reboot():
-    if max_intersection_val >= 2:
+    global last_cmdline, last_function
+
+    if last_function == 'sys_reboot':
         tls.answer_ok_and_pass()
         run(f'systemctl reboot', shell=True)
         sys.exit()
+
+    if max_intersection_val >= 2:
+        talk(f'Вы уверены?')
+        last_function = 'sys_reboot'
+        last_cmdline = cmdline
+        return 
 
 
 def conf_settings():

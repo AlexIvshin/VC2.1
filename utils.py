@@ -1,6 +1,6 @@
 import random
 import requests
-from subprocess import check_output
+from subprocess import check_output, call
 import sys
 import os
 from bs4 import BeautifulSoup
@@ -104,7 +104,11 @@ def choice_action(command, actions_dict) -> tuple:
 
 def check_prg(command) -> str:
     command_word = set(command.split(' '))
-    return ''.join([key for key, value in dg.programs_dict.items() if set(value).intersection(command_word)])
+    prg = ''.join([key for key, value in dg.programs_dict.items() if set(value).intersection(command_word)])
+    if prg and call(f'which {prg} >/dev/null', shell=True) != 0:
+        print(f'Program: "{prg}"')
+        return talk('Эта програма в системе не обнаружена!')
+    return prg
 
 
 def check_word_sequence(command, words) -> bool:

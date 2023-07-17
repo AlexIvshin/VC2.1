@@ -43,13 +43,10 @@ class ProgramManager:
 
     def get_program_name(self) -> str:
         if self.action == 'off':
-
             if self.program == 'google-chrome':
                 return 'chrome'
-
             if self.program == 'sudo virtualbox':
                 return 'VirtualBox'
-
         return self.program
 
     def start_stop_program(self):
@@ -60,9 +57,7 @@ class ProgramManager:
         tls.answer_ok_and_pass()
 
         if self.action == 'on':
-            if prg == 'konsole':
-                return run(f'{prg} --separate --hold -e "zsh" &', shell=True)
-            elif prg == 'tor':
+            if prg == 'tor':
                 return run(f'~/tor-browser/Browser/start-tor-browser >/dev/null 2>&1 &', shell=True)
             return run(f'{prg} >/dev/null 2>&1 &', shell=True)
 
