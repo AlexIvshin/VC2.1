@@ -107,7 +107,7 @@ def check_prg(command) -> str:
     prg = ''.join([key for key, value in dg.programs_dict.items() if set(value).intersection(command_word)])
     if prg and call(f'which {prg} >/dev/null', shell=True) != 0:
         print(f'Program: "{prg}"')
-        return talk('Эта програма в системе не обнаружена!')
+        return talk('Эта програма в системе не обнаружена!', print_str=f'Program: "{prg}"')
     return prg
 
 

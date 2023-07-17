@@ -99,7 +99,7 @@ class Assistant:
     def mic_sensitivity(cls, value: int) -> None:
         run(f'amixer -D pulse sset Capture {value}% >/dev/null', shell=True)
 
-    def speaks(self, words,
+    def speaks(self, words, print_str='',
                speech_pitch: int = config['Speech']['speech_pitch'],
                speech_rate: int = config['Speech']['speech_rate'],
                voice_profile: str = config['Speech']['voice_profile'],
@@ -107,6 +107,8 @@ class Assistant:
                mic_up: int = config['Mic']['mic_up']):
 
         def voice(text):
+            if print_str:
+                print(f'{print_str}')
             print(f'► {words.lstrip().replace("́", "")}')
             self.mic_sensitivity(0)
             run(f'echo {text} | RHVoice-test -q {quality} -r {speech_rate} '
