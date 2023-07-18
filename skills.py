@@ -28,9 +28,8 @@ from wordstonum import word2num_ru as w2n
 import utils as tls
 from widgets.hand_input_widget import get_input
 
-model = Assistant()
-talk = model.speaks
-mic_sins = model.mic_sensitivity
+talk = Assistant().speaks
+mic_sins = Assistant().mic_sensitivity
 
 homedir = os.getcwdb().decode(encoding='utf-8')
 
@@ -54,7 +53,7 @@ class ProgramManager:
         tls.answer_ok_and_pass()
 
         if self.action == 'on':
-            print(f'{prg.capitalize()} starts!')
+            print(f'  {prg.capitalize()} starts!')
             if prg == 'tor':
                 return run(f'~/tor-browser/Browser/start-tor-browser >/dev/null 2>&1 &', shell=True)
             return run(f'{prg} >/dev/null 2>&1 &', shell=True)
@@ -63,7 +62,7 @@ class ProgramManager:
             print(f'{prg.capitalize()} will be closed!')
             if prg == 'VirtualBox':
                 return run(f'sudo pkill {prg} >/dev/null 2>&1', shell=True)
-            return run(f'pkill {prg} >/dev/null 2>&1', shell=True)
+            return run(f'  pkill {prg} >/dev/null 2>&1', shell=True)
 
 
 class Calculator:

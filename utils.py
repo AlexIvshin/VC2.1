@@ -8,8 +8,7 @@ import re
 import dialog as dg
 from assistant import Assistant
 
-model = Assistant()
-talk = model.speaks
+talk = Assistant().speaks
 
 # Режимы
 notebook_mode = 'notebook'

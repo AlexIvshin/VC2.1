@@ -8,8 +8,7 @@ import skills
 import utils as tls
 from assistant import Assistant
 
-model = Assistant()
-talk = model.speaks
+talk = Assistant().speaks
 
 homedir = os.getcwdb().decode(encoding='utf-8')
 scriptdir: str = f'{homedir}/scripts/'

@@ -141,8 +141,7 @@ def thread_monitoring():
         time.sleep(10)
 
 
-model = Assistant()
-thread = Thread(target=model.listening)  # Создаём главный поток.
+thread = Thread(target=Assistant().listening)  # Создаём главный поток.
 is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком.
 
 

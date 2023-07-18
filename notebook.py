@@ -6,8 +6,7 @@ from wordstonum import word2num_ru as w2n
 import utils as tls
 
 file_action = FileLife()
-model = Assistant()
-talk = model.speaks
+talk = Assistant().speaks
 
 homedir = file_action.homedir
 note_dir = file_action.note_dir
