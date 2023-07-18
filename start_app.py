@@ -104,7 +104,7 @@ class AppWidget:
                    height=17,
                    border=0,
                    background='#000000',
-                   selectbackground='#090c10',
+                   selectbackground='#303d30',
                    highlightthickness=0,
                    insertwidth=0,
                    font='Hack 10',

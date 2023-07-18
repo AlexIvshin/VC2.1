@@ -61,10 +61,10 @@ class ProgramManager:
             return run(f'{prg} >/dev/null 2>&1 &', shell=True)
 
         if self.action == 'off' and call(f'pgrep {prg} >/dev/null', shell=True) == 0:
-            print(f'{prg.capitalize()} will be closed!')
+            print(f'  {prg.capitalize()} will be closed!')
             if prg == 'VirtualBox':
                 return run(f'sudo pkill {prg} >/dev/null 2>&1', shell=True)
-            return run(f'  pkill {prg} >/dev/null 2>&1', shell=True)
+            return run(f'pkill {prg} >/dev/null 2>&1', shell=True)
 
 
 class Calculator:
@@ -611,7 +611,7 @@ class Translators:
 
         if self.reverse:
             from_lang, to_lang = to_lang, from_lang
-        from_to = f' {from_lang.upper()} -> {to_lang.upper()}'
+        from_to = f'  {from_lang.upper()} -> {to_lang.upper()}'
         print(from_to)
 
         text = get_input() if tls.check_hand_input(self.commandline) else None
@@ -628,10 +628,10 @@ class Translators:
         translator_res = self.get_tranlate(text, from_lang, to_lang)
         googletrans_res = self.get_google_translate(text, to_lang)
         os.system('clear')
-        print(from_to, '\n')
-        print(f' "{text}"')
-        print(f' {translator_res} - версия translate')
-        print(f' {googletrans_res} - версия googletrans')
+        print(f'  {from_to}', '\n')
+        print(f'  Текст: "{text}"')
+        print(f'  {translator_res} - версия translate')
+        print(f'  {googletrans_res} - версия googletrans', '\n')
         talk(random.choice(dg.done))
 
 
