@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+###############################################################
+#  russian-speaking voice assistant for Debian kernel systems #
+###############################################################
+
 import argparse
 import configparser
 import pathlib

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 from dialog import notebook_action_dict, yes_no_dict
 from assistant import Assistant, stack

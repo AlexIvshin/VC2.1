@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import random
 import requests
 from subprocess import check_output, call

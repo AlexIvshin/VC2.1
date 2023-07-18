@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from bs4 import BeautifulSoup
 import configparser
 import cpuinfo
@@ -429,11 +431,9 @@ class Polyhistor:
     @staticmethod
     def get_saying() -> str:
         sayings = []
-
         with open(f'{homedir}/various_files/sayings.txt', 'r') as f:
             for line in f:
                 sayings.append(line.replace('\n', ''))
-
         return random.choice(sayings)
 
     def get_result(self):
@@ -441,8 +441,6 @@ class Polyhistor:
         if not self.intersection_chacker():
             return
         try:
-            talk(random.choice(dg.answer_ok))
-
             result = None
             if 'анекдот' in self.commandline and tls.check_internet():
                 result = self.get_joke()
@@ -453,7 +451,8 @@ class Polyhistor:
 
             talk(result, speech_rate=100)
             time.sleep(0.2)
-            talk(random.choice(dg.qustion_replay))
+            if 'поговорк' not in self.commandline:
+                talk(random.choice(dg.qustion_replay))
         except requests.exceptions.ConnectionError:
             talk('Упс! Что-то не так пошло! Скорее всего сеть отсутствует.')
 
@@ -793,8 +792,8 @@ class SysInformer:
         if gpu_temp >= gpu_temp_critical:
             talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {int(round(gpu_temp, 0))}°!')
 
-        print(f'-infolabele-■ Core temp: {core_temp}°   ■ GPU temp: {gpu_temp}°   ■ '
-              f'Mem used: {ram_per_used}%   ■ SWAP Used: {swap_per_used}%   ■ Runtime: no process', end='')
+        print(f'-infolabele-■ Core temp: {core_temp}°     ■ GPU temp: {gpu_temp}°     ■ '
+              f'Mem used: {ram_per_used}%     ■ SWAP Used: {swap_per_used}%     ■ Runtime: no process', end='')
 
     def get_sysinfo(self):
         sysinfo = self.create_sysinfo()
@@ -892,16 +891,12 @@ class ScriptStarter:
 
     def run_script(self):
         scr, scr_name = self.get_script()
-
         if not scr:
             return
-
-        print(scr_name)
+        print(f'  Script: "{scr_name}"')
         tls.answer_ok_and_pass()
-
         if 'sudo' in scr:
             tls.answer_ok_and_pass(answer=False, enter_pass=True)
-
         mic_sins(0)
         run(scr, shell=True)
         talk(random.choice(dg.done))
@@ -931,21 +926,21 @@ class Anonimizer:
 
         if not os.path.isfile(path_tor):
             talk('Тор в системе не обнаружен!')
-            print('Для установки Tor выполнить: sudo apt-get install tor')
+            print('Для установки Tor выполнить: <sudo apt-get install tor>')
             return False
 
         if not os.path.isfile(path_toriptables2):
-            talk('Тор-айпи-тэйбл в системе не обнаружен!')
-            print('Для установки toriptables2 выполнить:')
-            print('git clone https://github.com/ruped24/toriptables2')
-            print('cd toriptables2/')
-            print('sudo mv toriptables2.py /usr/local/bin/')
-            print('cd')
+            talk('Тор-айпи-тэйбл в системе не обнаружен! Для установки, следуйте инструкции!')
+            print('Для установки toriptables2 выполнить в терминале:')
+            print('1) <git clone https://github.com/ruped24/toriptables2>')
+            print('2) <cd toriptables2/>')
+            print('3) <sudo mv toriptables2.py /usr/local/bin/>')
+            print('4) <cd>')
             return False
 
         if not os.path.isfile(path_python2):
             talk('Для работы скрипта необходим пайтон2!')
-            print('sudo apt install python2')
+            print('Выполнить в терминале: <sudo apt install python2>')
             return False
 
         return True
