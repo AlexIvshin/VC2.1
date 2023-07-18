@@ -46,7 +46,9 @@ def choice_xterm(category) -> str:
     category_list = ['Xterm', 'XtermSmall', 'XtermInfo', 'XtermSearch']
 
     if category not in category_list:
-        raise NameError('Функция принимает только один из зтих аргументов: [Xterm, XtermSmall, XtermInfo, XtermSearch]')
+        raise AttributeError(
+            'Функция принимает только один из зтих аргументов: [Xterm, XtermSmall, XtermInfo, XtermSearch]'
+        )
 
     x = int(config[category]['x'])
     y = int(config[category]['y'])
@@ -73,8 +75,7 @@ def restart_app():
 
 
 def check_yesno_onoff(command, dictionary: dict) -> str:
-    command_word = set(command.split(' '))
-    return ''.join([key for key, value in dictionary.items() if set(value).intersection(command_word)])
+    return ''.join([key for key, value in dictionary.items() if set(value).intersection(set(command.split(' ')))])
 
 
 def check_hand_input(words) -> bool:

@@ -12,19 +12,19 @@ from vosk import Model, KaldiRecognizer, SetLogLevel
 
 
 class ShortTermMemory:
-    limit = 2
-    stack = []
+    __limit = 2
+    __stack = []
 
     def ad_element(self, action):
-        if len(self.stack) >= self.limit:
-            del self.stack[0]
-        self.stack.append(action)
+        if len(self.__stack) >= self.__limit:
+            del self.__stack[0]
+        self.__stack.append(action)
 
     def get_stack(self) -> list:
-        return self.stack
+        return self.__stack
 
     def clear_stack(self):
-        return self.stack.clear()
+        return self.__stack.clear()
 
 
 stack = ShortTermMemory()
@@ -126,35 +126,32 @@ class Assistant:
         from skills import Translators, ProgramManager
         from notebook import notebook_reacts
 
-        command_line = command
-        self.mode = tls.choice_mode(command_line, var_mode=self.mode)  # Переопределение режима
+        cmdline = command
+        self.mode = tls.choice_mode(cmdline, var_mode=self.mode)  # Переопределение режима
 
         try:
             if self.mode == tls.notebook_mode:
-                notebook_reacts(command_line)
+                notebook_reacts(cmdline)
             elif self.mode == tls.translator_mode:
-                transltr = Translators(command_line)
-                transltr.get_result()
+                Translators(cmdline).get_result()
             elif self.mode == tls.reverse_mode:
-                transltr = Translators(command_line, reverse=True)
-                transltr.get_result()
+                Translators(cmdline, reverse=True).get_result()
             elif self.mode == tls.sleep_mode:
                 return
 
-            on_off = tls.check_yesno_onoff(command_line, dictionary=on_off_dict)  # Определение вкл/выкл
-            yes_no = tls.check_yesno_onoff(command_line, dictionary=yes_no_dict)  # Определение да/нет
-            program = tls.check_prg(command_line)  # Определение имени программы, если таковая есть в команде
+            on_off = tls.check_yesno_onoff(cmdline, dictionary=on_off_dict)  # Определение вкл/выкл
+            yes_no = tls.check_yesno_onoff(cmdline, dictionary=yes_no_dict)  # Определение да/нет
+            program = tls.check_prg(cmdline)  # Определение имени программы, если таковая есть в команде
 
             if program and on_off:
-                manager = ProgramManager(program, on_off)
-                return manager.start_stop_program()  # возвращаем функцию запуска/остановки программы
+                ProgramManager(program, on_off).start_stop_program()
 
             if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
                 alib.yesno_action(yes_no)
             else:  # выбор реакций модели на команды
-                action, max_intersection = tls.choice_action(command_line, actions_dict=actions_dict)
+                action, max_intersection = tls.choice_action(cmdline, actions_dict)
                 if action:
-                    alib.callfunc(command_line, action, max_intersection, onoff=on_off)
+                    alib.callfunc(cmdline, action, max_intersection, onoff=on_off)
 
         except (AttributeError, ValueError):
             pass

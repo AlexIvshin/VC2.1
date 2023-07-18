@@ -39,13 +39,7 @@ def callfunc(command_line, action, maxintersect, onoff=None):
     max_intersection_val = maxintersect
     on_off = onoff
 
-    try:
-        if 'start_script' in function:
-            start_script(function)
-        else:
-            globals()[function]()
-    except KeyError:
-        pass
+    start_script(function) if 'start_script' in function else globals()[function]()
 
 
 def hello():
@@ -72,28 +66,23 @@ def i_am_output():
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
 def mode_anonim():
-    anonim = skills.Anonimizer(max_intersection_val, on_off)
-    anonim.start_stop_anonimizer()
+    skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
 
 
 def start_script(foo_str):
-    script = skills.ScriptStarter(foo_str, max_intersection_val)
-    script.run_script()
+    skills.ScriptStarter(foo_str, max_intersection_val).run_script()
 
 
 def search():
-    search_engine = skills.SearchEngine(cmdline, function, max_intersection_val)
-    search_engine.get_result()
+    skills.SearchEngine(cmdline, function, max_intersection_val).get_result()
 
 
 def calculate():
-    calc = skills.Calculator(cmdline, function)
-    calc.tell_the_result()
+    skills.Calculator(cmdline, function).tell_the_result()
 
 
 def weather():
-    sinoptik = skills.Sinoptik(cmdline, max_intersection_val)
-    sinoptik.get_weather_forecast()
+    skills.Sinoptik(cmdline, max_intersection_val).get_weather_forecast()
 
 
 def stop_app():
@@ -128,21 +117,18 @@ def sys_reboot():
 
 
 def conf_settings():
-    setconfig = skills.AssistantSettings(cmdline)
-    setconfig.change_conf_set()
+    skills.AssistantSettings(cmdline).change_conf_set()
 
 
 def volume_settings():
-    setvolume = skills.AssistantSettings(cmdline)
-    setvolume.change_volume()
+    skills.AssistantSettings(cmdline).change_volume()
 
 
 def random_joke():
     global last_cmdline, last_function
     last_function = 'random_joke'
     last_cmdline = cmdline
-    result = skills.Polyhistor(cmdline, max_intersection_val)
-    result.get_result()
+    skills.Polyhistor(cmdline, max_intersection_val).get_result()
 
 
 def show_sys_info():
@@ -154,5 +140,4 @@ def show_sys_info():
 
 
 def exchange_rates():
-    rates = skills.ExchangeRates(cmdline, max_intersection_val)
-    rates.get_exchange_rates()
+    skills.ExchangeRates(cmdline, max_intersection_val).get_exchange_rates()

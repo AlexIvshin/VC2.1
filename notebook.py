@@ -1,5 +1,5 @@
 import os
-import dialog as dg
+from dialog import notebook_action_dict, yes_no_dict
 from assistant import Assistant, stack
 from skills import FileLife
 from wordstonum import word2num_ru as w2n
@@ -35,9 +35,9 @@ def notebook_reacts(commandline):
     global action, file, cmdline
 
     cmdline = commandline
-    yes_no = tls.check_yesno_onoff(cmdline, dictionary=dg.yes_no_dict)
+    yes_no = tls.check_yesno_onoff(cmdline, dictionary=yes_no_dict)
     num_file = w2n(cmdline)
-    action, intersection = tls.choice_action(cmdline, dg.notebook_action_dict)
+    action, intersection = tls.choice_action(cmdline, notebook_action_dict)
     mem_stack: list = stack.get_stack()
 
     if yes_no == 'cancel':

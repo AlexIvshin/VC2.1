@@ -16,7 +16,7 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from subprocess import run, check_output
+from subprocess import run, check_output, call
 from tabulate import tabulate as tb
 import time
 import webbrowser
@@ -51,22 +51,18 @@ class ProgramManager:
 
     def start_stop_program(self):
         prg = self.get_program_name()
-        if not prg or not self.action:
-            return
-
         tls.answer_ok_and_pass()
 
         if self.action == 'on':
+            print(f'{prg.capitalize()} starts!')
             if prg == 'tor':
                 return run(f'~/tor-browser/Browser/start-tor-browser >/dev/null 2>&1 &', shell=True)
             return run(f'{prg} >/dev/null 2>&1 &', shell=True)
 
-        if self.action == 'off':
-            if run(f'pgrep {prg}', shell=True).returncode != 0:
-                return
+        if self.action == 'off' and call(f'pgrep {prg} >/dev/null', shell=True) == 0:
+            print(f'{prg.capitalize()} will be closed!')
             if prg == 'VirtualBox':
                 return run(f'sudo pkill {prg} >/dev/null 2>&1', shell=True)
-            print(self.program, 'close')
             return run(f'pkill {prg} >/dev/null 2>&1', shell=True)
 
 
