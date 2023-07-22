@@ -108,7 +108,6 @@ class Calculator:
 
     def tell_the_result(self):
         result = self.get_result()
-
         if not result:
             return
 
@@ -128,33 +127,26 @@ class Calculator:
 class SearchEngine:
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
 
-    def __init__(self, commandline, action, intersection):
-        self.commandline = commandline
-        self.action = action
-        self.intersection = intersection
-
-    def get_search_words(self) -> str:
-        search_words = tls.get_meat(self.action, self.commandline, dg.actions_dict) if self.intersection >= 2 else None
-
-        if search_words and tls.check_internet():
-            if tls.check_hand_input(search_words):
-                search_words = get_input()
-            talk(random.choice(dg.answer_ok))
-            print(f' Ищу: "{search_words}"')
-            return search_words
-
-    def get_result(self):
-        search_words = self.get_search_words()
-
+    def __init__(self, cmd, action, intersection):
+        if intersection < 2 or not tls.check_internet():
+            return
+        search_words = get_input() if tls.check_hand_input(cmd) else tls.get_meat(action, cmd, dg.actions_dict)
         if not search_words:
             return
+        self.search_words = search_words
+        self.commandline = cmd
+        self.action = action
+        talk(random.choice(dg.answer_ok))
+
+    def get_result(self):
+        print(f' Ищу: "{self.search_words}"')
 
         if 'гугл' in self.commandline:
-            return self.google_search(search_words)
+            return self.google_search(self.search_words)
         elif 'вики' in self.commandline:
-            return self.wiki_search(search_words)
+            return self.wiki_search(self.search_words)
         else:
-            return self.wiki_short_answer(search_words)
+            return self.wiki_short_answer(self.search_words)
 
     @classmethod
     def exception_words(cls, wiki_error=False):
@@ -186,8 +178,7 @@ class SearchEngine:
                 driver = webdriver.Firefox()
 
             if not driver:
-                talk('Ой! Браузер по умолчанию, не найден!')
-                return
+                return talk('Ой! Браузер по умолчанию, не найден!')
 
         try:
             driver.get(url)
@@ -310,12 +301,12 @@ class Sinoptik:
         'тираспол': 'тирасполь'
     }
     weekdays = ['0', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+    site_url = 'https://sinoptik.ua'
 
     def __init__(self, commandline, intersection):
         self.commandline = commandline
         self.intersection = intersection
         self.split_commandline = commandline.split()
-        self.site_url = 'https://sinoptik.ua'
 
     @classmethod
     def get_week_day(cls, number) -> int:
@@ -323,7 +314,7 @@ class Sinoptik:
 
     def get_url(self) -> str:
         for word in self.split_commandline:
-            for key in self.cities.keys():
+            for key in self.cities:
                 if key in word:
                     talk(random.choice(dg.answer_ok))
                     return f'{self.site_url}/погода-{self.cities[key]}'
@@ -331,17 +322,18 @@ class Sinoptik:
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self):
+
         if self.intersection < 2 or not tls.check_internet():
             return
 
         url_weather_city = self.get_url()
+        if not url_weather_city:
+            return
+
         current_date = date.today()
         current_weekday = int(date.isoweekday(current_date))
 
         try:
-            if not url_weather_city:
-                return
-
             r = requests.get(url_weather_city)
             if r.status_code != 200:
                 print(f'Status code: {r.status_code} !!!')
@@ -397,16 +389,15 @@ class Sinoptik:
 
 class Polyhistor:
     def __init__(self, commandline, intersection):
+        if intersection < 2:
+            return
         self.commandline = commandline
-        self.intersection = intersection
-
-    def intersection_chacker(self) -> bool:
-        return True if self.intersection >= 2 else None
 
     @staticmethod
-    def get_joke() -> str:
+    def get_joke():
+        if not tls.check_internet():
+            return
         url_joke = 'https://www.anekdot.ru/random/anekdot/'
-
         r = requests.get(url_joke)
         if r.status_code != 200:
             print('Status code: ', r.status_code)
@@ -422,7 +413,9 @@ class Polyhistor:
         return random.choice(joke)
 
     @staticmethod
-    def get_fact() -> str:
+    def get_fact():
+        if not tls.check_internet():
+            return
         f = randfacts.get_fact(False)
         tr = Translator()
         fact = tr.translate(f, dest='ru')
@@ -437,14 +430,11 @@ class Polyhistor:
         return random.choice(sayings)
 
     def get_result(self):
-
-        if not self.intersection_chacker():
-            return
         try:
             result = None
-            if 'анекдот' in self.commandline and tls.check_internet():
+            if 'анекдот' in self.commandline:
                 result = self.get_joke()
-            if 'факт' in self.commandline and tls.check_internet():
+            if 'факт' in self.commandline:
                 result = self.get_fact()
             if 'поговорк' in self.commandline or 'пословиц' in self.commandline:
                 result = self.get_saying()
@@ -460,8 +450,9 @@ class Polyhistor:
 class ExchangeRates:
 
     def __init__(self, commandline, intersection):
+        if intersection < 2 or not tls.check_internet():
+            return
         self.commandline = commandline
-        self.intersection = intersection
 
     @staticmethod
     def correct_value_rate(rate) -> str:
@@ -485,29 +476,21 @@ class ExchangeRates:
         currency = 'доллара'
 
         if 'доллар' in self.commandline:
-            key = 'usd'
-            currency = 'доллара'
+            key, currency = 'usd', 'доллара'
         elif 'евро' in self.commandline:
-            key = 'eur'
-            currency = 'евро'
+            key, currency = 'eur', 'евро'
         elif 'злот' in self.commandline or 'польск' in self.commandline:
-            key = 'pln'
-            currency = 'польского злотого'
+            key, currency = 'pln', 'польского злотого'
 
         return key, currency
 
     def get_exchange_rates(self):
-
-        if self.intersection < 2 or not tls.check_internet():
-            return
-
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
         currency_key, currency = self.determine_the_currency()
 
         try:
             url = f'https://minfin.com.ua/currency/banks/{currency_key}/'
             r = requests.get(url)
-
             if r.status_code != 200:
                 print(f'Status code: {r.status_code} !!!')
                 return talk('Упс! Целевой сервер не отвечает.')
@@ -523,11 +506,7 @@ class ExchangeRates:
 
             while len(exchange_rates) <= 5:
                 buy = soup_buy[count].text
-
-                if count == 0:
-                    sale = soup_sale[0].text
-                else:
-                    sale = soup_sale[count * 2].text
+                sale = soup_sale[0].text if count == 0 else soup_sale[count * 2].text
 
                 if buy and sale:
                     bank_name = soup_banks_names[count].text.replace('\n', '').strip()
@@ -559,6 +538,8 @@ class ExchangeRates:
 
 class Translators:
     def __init__(self, commandline, reverse=False):
+        if not tls.check_internet():
+            return
         self.commandline = commandline
         self.reverse = reverse
 
@@ -616,12 +597,12 @@ class Translators:
 
         text = get_input() if tls.check_hand_input(self.commandline) else None
 
-        if 'текст' in self.commandline:
+        if 'текст' in self.commandline and not text:
             split_commandline = self.commandline.split()
             index = split_commandline.index('текст')
             text = ' '.join(split_commandline[index + 1:])
 
-        if not text or not tls.check_internet():
+        if not text:
             return
 
         tls.answer_ok_and_pass()
@@ -639,7 +620,6 @@ class SysInformer:
     @classmethod
     def correct_size(cls, bts, ending='iB') -> str:
         _size = 1024
-
         for item in ["", "K", "M", "G", "T", "P"]:
             if bts < _size:
                 return f"{bts:.2f}{item}{ending}"
@@ -687,21 +667,15 @@ class SysInformer:
         iface_name, local_ip, mac = '', '', ''
 
         for i in psutil.net_if_addrs().keys():
-
             for n in psutil.net_if_addrs()[i]:
-
                 if n.broadcast and n.netmask:
                     iface_name = i
                     local_ip = n.address
-
                 if n.broadcast and i == iface_name:
                     mac = n.address
 
         collect_info_dict['info']['net_info']: dict = {}
-        collect_info_dict['info']['net_info'][iface_name] = {
-            'mac': mac,
-            'local_ip': local_ip}
-
+        collect_info_dict['info']['net_info'][iface_name] = {'mac': mac, 'local_ip': local_ip}
         return collect_info_dict
 
     @staticmethod
@@ -760,11 +734,8 @@ class SysInformer:
         cores_temps = []
         gpus_temps = []
 
-        for temp in psutil.sensors_temperatures()['coretemp']:
-            cores_temps.append(temp.current)
-
-        for gpu in gpus:
-            gpus_temps.append(gpu.temperature)
+        [cores_temps.append(temp.current) for temp in psutil.sensors_temperatures()['coretemp']]
+        [gpus_temps.append(gpu.temperature) for gpu in gpus]
 
         ram_per_used: float = psutil.virtual_memory().percent
         swap_per_used: float = psutil.swap_memory().percent
@@ -904,20 +875,6 @@ class ScriptStarter:
 
 class Anonimizer:
 
-    def __init__(self, intersection, on_off):
-        self.intersection = intersection
-        self.on_off = on_off
-
-    @staticmethod
-    def get_ip() -> str:
-        get_ip_url = 'https://api.ipify.org'
-        try:
-            response = requests.get(get_ip_url)
-            ip_address = response.text
-            return ip_address
-        except requests.exceptions.ConnectionError:
-            talk('Похоже проблемы с интернетом!')
-
     @staticmethod
     def component_check() -> bool:
         path_tor = '/usr/sbin/tor'
@@ -945,10 +902,22 @@ class Anonimizer:
 
         return True
 
-    def start_stop_anonimizer(self):
-        if self.intersection < 2 or not self.component_check() or not tls.check_internet():
+    def __init__(self, intersection, on_off):
+        if intersection < 2 or not tls.check_internet() or not self.component_check():
             return
+        self.on_off = on_off
 
+    @staticmethod
+    def get_ip() -> str:
+        get_ip_url = 'https://api.ipify.org'
+        try:
+            response = requests.get(get_ip_url)
+            ip_address = response.text
+            return ip_address
+        except requests.exceptions.ConnectionError:
+            talk('Похоже проблемы с интернетом!')
+
+    def start_stop_anonimizer(self):
         if self.on_off == 'on':
             ipaddress = self.get_ip()
             print(f'Мой IP: {ipaddress}')
@@ -972,18 +941,21 @@ class FileLife:
     @staticmethod
     def file_name_assignment(path, name=None) -> str:
         print(f'"{path}"')
+        file_name = name
+
         while True:
-            if name:
-                file_name = name
-            else:
-                print('Рекомендуемый формат имени файла: [name.extension]')
-                talk('Необходимо ввести имя файла!')
+            if not file_name:
+                print('  Рекомендуемый формат имени файла: [name.extension]')
+                talk('Введите имя файла!')
                 file_name = get_input()
                 file_name = file_name.replace(' ', '_')
 
             if os.path.isfile(f'{path}/{file_name}'):
                 talk('Файл с таким именем уже существует. Необходимо выбрать другое имя!')
-            elif file_name == '':
+                file_name = None
+                continue
+
+            if file_name == '':
                 talk('Имя файла не может быть пустым!')
             else:
                 return file_name
@@ -1001,6 +973,7 @@ class FileLife:
         if data:
             file.write(str(data))
         file.close()
+        return True
 
     def rename_file(self, old_name):
         new_file_name = self.file_name_assignment(self.note_dir)
@@ -1009,31 +982,19 @@ class FileLife:
         tls.answer_ok_and_pass()
         os.rename(old_file, new_file)
 
-    def create_memo_file(self, commandline):
-        if tls.check_hand_input(commandline):
-            memo_data = get_input()
-        else:
-            indexes = []
-            split_commandline = commandline.split(' ')
-
-            for word in dg.notebook_action_dict['create_memo_file']:
-                if word in split_commandline:
-                    indexes.append(split_commandline.index(word))
-
-            index_keyword = max(indexes)
-            memo_data = ' '.join(split_commandline[index_keyword + 1:])
+    def create_memo_file(self, cmd):
+        memo_data = get_input() if tls.check_hand_input(cmd) \
+            else tls.get_meat('create_memo_file', cmd, dg.notebook_action_dict)
+        if not memo_data:
+            return False
 
         short_name = ' '.join(memo_data.split()[0:3])
         current_time = datetime.datetime.now().strftime('%d%m%y')
         file_name = f'''{short_name}_{current_time}.txt'''.replace(' ', '_')
         memo_data = w2n(memo_data, otherwords=True)
 
-        if not memo_data:
-            return False
-
         if self.create_file(file_name, memo_data):
             talk('Мемо-файл создан!')
-            print(file_name)
 
     def edit_file(self, file):
         tls.answer_ok_and_pass()

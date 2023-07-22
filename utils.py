@@ -27,8 +27,10 @@ wakeup_cmd = 'первая проснись'
 
 
 def get_displaysize() -> tuple[int, int]:
-    size = check_output(f'''xrandr | grep 'Screen 0:' | awk -F ',' '{{print $2}}' | awk '{{print $2, $4}}' ''',
-                        encoding='utf-8', shell=True)
+    size = check_output(
+        f'''xrandr | grep 'Screen 0:' | awk -F ',' '{{print $2}}' | awk '{{print $2, $4}}' ''',
+        encoding='utf-8',
+        shell=True)
     displaysize_x, displaysize_y = int(size.split()[0]), int(size.split()[1])
     return displaysize_x, displaysize_y
 
@@ -41,32 +43,22 @@ def choice_xterm(category) -> str:
     import configparser
     import pathlib
 
-    config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
     config = configparser.ConfigParser()
-    config.read(config_path)
+    config.read(pathlib.Path(__file__).parent.absolute() / "settings.ini")
+
     category_list = ['Xterm', 'XtermSmall', 'XtermInfo', 'XtermSearch']
+    ctgr = 'Xterm' if category not in category_list else category
+    title = ctgr
 
-    if category not in category_list:
-        raise AttributeError(
-            'Функция принимает только один из зтих аргументов: [Xterm, XtermSmall, XtermInfo, XtermSearch]'
-        )
+    x, y = int(config[ctgr]['x']), int(config[ctgr]['y'])
+    fg, bg, fontsize = config[ctgr]['fg'], config[ctgr]['bg'], int(config[ctgr]['fontsize'])
 
-    x = int(config[category]['x'])
-    y = int(config[category]['y'])
-    fg = config[category]['fg']
-    bg = config[category]['bg']
-    fontsize = int(config[category]['fontsize'])
-    title = category
-    pos_x = xterm_x_position(x)
-    pos_y = 350
-    hold = ''
+    if ctgr == 'XtermInfo':
+        pos_x, pos_y = 10, 20
+    else:
+        pos_x, pos_y = xterm_x_position(x), 350
 
-    if category == 'XtermInfo':
-        pos_x = 10
-        pos_y = 20
-
-    if category in category_list[2:]:
-        hold = '-hold'
+    hold = '-hold' if ctgr in category_list[2:] else ''
     return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
 
 
@@ -76,27 +68,21 @@ def restart_app():
 
 
 def check_yesno_onoff(command, dictionary: dict) -> str:
-    return ''.join([key for key, value in dictionary.items() if set(value).intersection(set(command.split(' ')))])
+    return ''.join([key for key, value in dictionary.items() if set(value) & set(command.split(' '))])
 
 
-def check_hand_input(words) -> bool:
+def check_hand_input(words):
     input_words = ['ручной', 'клавиатура', 'клавиатуры', 'ввод', 'вот', 'ручную']
-
-    if len(set(words.split(' ')).intersection(set(input_words))) > 1:
-        talk('Жду ввода с клавиатуры!')
-        return True
+    talk('Жду ввода с клавиатуры!') if len(set(words.split(' ')) & set(input_words)) > 1 else None
 
 
-def choice_action(command, actions_dict) -> tuple:
-    command_word = set(command.split(' '))
-    max_intersection: int = 0
-    action = None
+def choice_action(command, d: dict) -> tuple:
+    max_intersection, action = 0, None
 
-    for key, value in actions_dict.items():
-        len_val = len(set(value).intersection(command_word))  # кол-во вхождений(пересечений)
+    for key, value in d.items():
+        len_val = len(set(value) & set(command.split(' ')))  # кол-во вхождений(пересечений)
         if len_val > max_intersection:
-            max_intersection = len_val
-            action = key
+            max_intersection, action = len_val, key
 
     if action:
         return action, max_intersection
@@ -104,26 +90,20 @@ def choice_action(command, actions_dict) -> tuple:
         return None, None
 
 
-def check_prg(command) -> str:
-    command_word = set(command.split(' '))
-    prg = ''.join([key for key, value in dg.programs_dict.items() if set(value).intersection(command_word)])
+def check_prg(command) -> str:  # Определяем програму и её наличие в системе
+    prg = ''.join([key for key, value in dg.programs_dict.items() if set(value) & set(command.split(' '))])
+
     if prg and call(f'which {prg} >/dev/null', shell=True) != 0:
         print(f'Program: "{prg}"')
         return talk('Эта програма в системе не обнаружена!', print_str=f'Program: "{prg}"')
     return prg
 
 
-def check_word_sequence(command, words) -> bool:
+def check_word_sequence(command, words) -> bool:  # Проверяем идут ли слова вхождения одно за другим
     indexes_words: list = []
     [indexes_words.append(command.split(' ').index(i)) for i in words]  # список индексов слов вхождения
     indexes_words.sort()  # сортируем список
-
-    count = 0
-    while count < len(indexes_words) - 1:
-        if indexes_words[count] - indexes_words[count + 1] != -1:
-            return False
-        count += 1
-    return True
+    return all(a - b == 1 for a, b in zip(indexes_words[1:], indexes_words))
 
 
 def answer_ok_and_pass(answer=True, enter_pass=False) -> None:
@@ -133,47 +113,33 @@ def answer_ok_and_pass(answer=True, enter_pass=False) -> None:
         talk(random.choice(dg.enter_pass_answer))
 
 
-def get_intersection_word(action, command, dictionary: dict) -> list:
-    intersection_words = []
-
-    for word in command.split(' '):
-        for i in dictionary[action]:
-            if word == i:
-                intersection_words.append(word)
-    return intersection_words
+def get_intersection_word(act, cmd, d: dict) -> list:
+    isection_words = []
+    [isection_words.append(word) if word == i else None for i in cmd.split(' ') for word in d[act]]
+    return isection_words
 
 
-def get_meat(action, command, dictionary: dict) -> str:
-    command_words = command.split(' ')
-    keywords = get_intersection_word(action, command, dictionary)
-    keyword = keywords[-1]
-    keyindex = command_words.index(keyword)
-    meat = ' '.join(command_words[keyindex + 1:])
-    return meat
+def get_meat(act, cmd, d: dict) -> str:  # Возвращает остаток строки после последнего вхождения
+    split_cmd = cmd.split(' ')
+    return ' '.join(split_cmd[split_cmd.index(get_intersection_word(act, cmd, d)[-1]) + 1:])
 
 
-def get_ip() -> str:
+def get_ip() -> [str]:
     try:
         url = "https://pr-cy.ru/browser-details/"
         r = requests.get(url)
+        if r.status_code != 200:
+            return
+        soup = BeautifulSoup(r.text, "html.parser")
+        ip_addr = soup.find('div', class_="ip-myip").text
+        info = soup.find_all('div', class_="group-box__desc")
+        my_info = []
+        [my_info.append(re.sub(r'[^A-zА-яё0123456789.,:;!?-]', ' ', str(title.text.strip()))) for title in info]
 
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, "html.parser")
-            ip_addr = soup.find('div', class_="ip-myip").text
-            info = soup.find_all('div', class_="group-box__desc")
-
-            my_info = []
-
-            for title in info:
-                article_title = title.text.strip()
-                str_info = re.sub(r'[^A-zА-яё0123456789.,:;!?-]', ' ', str(article_title))
-                my_info.append(str_info)
-
-            print(f'     IP: {ip_addr}')
-            print(f'Country: {my_info[1]}')
-            print(f'    ISP: {my_info[0]}')
-            return ip_addr
-
+        print(f'     IP: {ip_addr}')
+        print(f'Country: {my_info[1]}')
+        print(f'    ISP: {my_info[0]}')
+        return ip_addr
     except requests.exceptions.ConnectionError:
         pass
 
