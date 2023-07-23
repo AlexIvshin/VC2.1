@@ -121,7 +121,8 @@ def get_intersection_word(act, cmd, d: dict) -> list:
 
 def get_meat(act, cmd, d: dict) -> str:  # Возвращает остаток строки после последнего вхождения
     split_cmd = cmd.split(' ')
-    return ' '.join(split_cmd[split_cmd.index(get_intersection_word(act, cmd, d)[-1]) + 1:])
+    isection_words = get_intersection_word(act, cmd, d)
+    return ' '.join(split_cmd[split_cmd.index(isection_words[-1]) + 1:]) if isection_words else None
 
 
 def get_ip() -> [str]:

@@ -74,14 +74,11 @@ class Calculator:
     }
 
     def __init__(self, commandline, action):
-        self.commandline = commandline
-        self.action = action
-        calc_string = w2n(tls.get_meat(action, self.commandline, dg.actions_dict), otherwords=True).split()
-        self.oper = self.n1 = self.n2 = None
+        calc_string = w2n(tls.get_meat(action, commandline, dg.actions_dict), otherwords=True).split()
+        o = ' '.join(calc_string[1:-1])
+        self.oper = self.opers[o] if o in self.opers.keys() else None
         self.n1 = self.check_type_num(calc_string[0])
         self.n2 = self.check_type_num(calc_string[-1])
-        oper = ' '.join(calc_string[1:-1])
-        self.oper = self.opers[oper] if oper in self.opers.keys() else None
 
     @classmethod
     def check_type_num(cls, n) -> int or float:
@@ -111,6 +108,19 @@ class Calculator:
         if not result:
             return
 
+        def get_correct_float_res(float_num) -> str:
+            integer_string, decimal_string = str(float_num).split('.')[0], str(round(float_num, 3)).split('.')[1]
+            decimal_title = ''
+            if len(decimal_string) == 1:
+                decimal_title = 'десятых'
+            if len(decimal_string) == 2:
+                decimal_title = 'сотых'
+            if len(decimal_string) == 3:
+                decimal_title = 'тысячных'
+            sep = 'целая' if str(integer_string)[-1] == '1' else 'целых'
+
+            return f'{integer_string} {sep} {decimal_string} {decimal_title}'
+
         tls.answer_ok_and_pass()
         print()
         print(f' {self.n1} {self.oper} {self.n2} = {round(result, 4)}')
@@ -118,10 +128,8 @@ class Calculator:
 
         if isinstance(result, int):
             return talk(f'Будет: {result}')
-
         if isinstance(result, float):
-            float_result = f'''{str(round(result, 3)).replace('.', ' целых и ')}'''
-            return talk(f'Приблизительно будет: {float_result}')
+            return talk(f'Приблизительно будет: {get_correct_float_res(result)}')
 
 
 class SearchEngine:
@@ -922,6 +930,7 @@ class Anonimizer:
             ipaddress = self.get_ip()
             print(f'Мой IP: {ipaddress}')
             tls.answer_ok_and_pass(enter_pass=True)
+            mic_sins(0)
             run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -l', shell=True)
             new_ipaddress = self.get_ip()
             print(f'Мой новый IP: {new_ipaddress}')
@@ -929,6 +938,7 @@ class Anonimizer:
 
         if self.on_off == 'off':
             tls.answer_ok_and_pass(enter_pass=True)
+            mic_sins(0)
             run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -f', shell=True)
             print(f'Мой IP: {self.get_ip()}')
             return talk(random.choice(dg.done))

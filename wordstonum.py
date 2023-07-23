@@ -7,6 +7,7 @@ russian_number_system = {
     'нулём': 0,
     'нуле': 0,
     'один': 1,
+    'одна': 1,
     'единица': 1,
     'одного': 1,
     'одному': 1,
@@ -159,7 +160,7 @@ russian_number_system = {
     'целая': '.'
 }
 
-decimal_words = ['ноль', 'один', 'одна', 'два', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять']
+# decimal_words = ['ноль', 'один', 'одна', 'два', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять']
 
 '''
 function to form numeric multipliers for million, billion, thousand etc.
@@ -191,13 +192,16 @@ output: double
 
 
 def get_decimal_sum(decimal_digit_words):
-    decimal_number_str = []
-    for dec_word in decimal_digit_words:
-        if dec_word not in decimal_words:
-            return 0
-        else:
-            decimal_number_str.append(russian_number_system[dec_word])
-    final_decimal_string = '0.' + ''.join(map(str, decimal_number_str))
+    # decimal_number_str = []
+    # for dec_word in decimal_digit_words:
+    #     if dec_word not in decimal_words:
+    #         return 0
+    #     else:
+    #         decimal_number_str.append(russian_number_system[dec_word])
+
+    # final_decimal_string = '0.' + ''.join(map(str, decimal_number_str))
+    decimal_number_str = word_to_num(' '.join(decimal_digit_words))
+    final_decimal_string = '0.' + str(decimal_number_str)
     return float(final_decimal_string)
 
 
@@ -235,7 +239,7 @@ def word_to_num(number_sentence):
     if len(clean_numbers) == 0:
         return number_sentence
 
-    # Error if user enters million,billion, thousand or decimal point twice
+    # Error if user enters million, billion, thousand or decimal point twice
     if clean_numbers.count('тысяча') > 1 \
             or clean_numbers.count('миллион') > 1 \
             or clean_numbers.count('миллиард') > 1 \
@@ -245,9 +249,12 @@ def word_to_num(number_sentence):
                          "(eg. two million twenty three thousand and forty nine)")
 
     # separate decimal part of number (if exists)
-    if clean_numbers.count('целых') == 1 or clean_numbers.count('целая') == 1:
+    if clean_numbers.count('целых') == 1:
         clean_decimal_numbers = clean_numbers[clean_numbers.index('целых') + 1:]
         clean_numbers = clean_numbers[:clean_numbers.index('целых')]
+    if clean_numbers.count('целая') == 1:
+        clean_decimal_numbers = clean_numbers[clean_numbers.index('целая') + 1:]
+        clean_numbers = clean_numbers[:clean_numbers.index('целая')]
 
     if 'миллиард' in clean_numbers:
         billion_index = clean_numbers.index('миллиард')
