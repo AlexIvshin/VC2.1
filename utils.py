@@ -155,7 +155,7 @@ def check_internet() -> bool:  # internet check feature
     try:
         socket.setdefaulttimeout(timeout)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        print('Интернет... OK')
+        print('  Интернет... OK')
         return True
 
     except socket.error as e:

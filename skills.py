@@ -68,15 +68,11 @@ class ProgramManager:
 
 
 class Calculator:
-    opers: dict = {
-        'плюс': '+', 'минус': '-', 'отнять': '-', 'умножить на': '*', 'множить на': '*',
-        'разделить на': '/', 'раздели на': '/', 'дели на': '/', 'делить на': '/'
-    }
 
     def __init__(self, commandline, action):
         calc_string = w2n(tls.get_meat(action, commandline, dg.actions_dict), otherwords=True).split()
-        o = ' '.join(calc_string[1:-1])
-        self.oper = self.opers[o] if o in self.opers.keys() else None
+        opr = ' '.join(calc_string[1:-1])
+        self.operator = dg.opers[opr] if opr in dg.opers.keys() else None
         self.n1 = self.check_type_num(calc_string[0])
         self.n2 = self.check_type_num(calc_string[-1])
 
@@ -88,16 +84,16 @@ class Calculator:
             pass
 
     def get_result(self):
-        n1, oper, n2 = self.n1, self.oper, self.n2
-        if not oper or not n1 or not n2:
+        n1, operator, n2 = self.n1, self.operator, self.n2
+        if not operator or not n1 or not n2:
             return
-        if oper == '+':
+        if operator == '+':
             return n1 + n2
-        elif oper == '-':
+        elif operator == '-':
             return n1 - n2
-        elif oper == '*':
+        elif operator == '*':
             return n1 * n2
-        elif oper == '/':
+        elif operator == '/':
             try:
                 return n1 / n2
             except ZeroDivisionError:
@@ -118,12 +114,11 @@ class Calculator:
             if len(decimal_string) == 3:
                 decimal_title = 'тысячных'
             sep = 'целая' if str(integer_string)[-1] == '1' else 'целых'
-
             return f'{integer_string} {sep} {decimal_string} {decimal_title}'
 
         tls.answer_ok_and_pass()
         print()
-        print(f' {self.n1} {self.oper} {self.n2} = {round(result, 4)}')
+        print(f'  {self.n1} {self.operator} {self.n2} = {round(result, 4)}')
         print()
 
         if isinstance(result, int):
@@ -136,10 +131,8 @@ class SearchEngine:
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
 
     def __init__(self, cmd, action, intersection):
-        if intersection < 2 or not tls.check_internet():
-            return
         search_words = get_input() if tls.check_hand_input(cmd) else tls.get_meat(action, cmd, dg.actions_dict)
-        if not search_words:
+        if intersection < 2 or not search_words or not tls.check_internet():
             return
         self.search_words = search_words
         self.commandline = cmd
@@ -463,19 +456,11 @@ class ExchangeRates:
         self.commandline = commandline
 
     @staticmethod
-    def correct_value_rate(rate) -> str:
+    def correct_value_rate(float_num) -> str:
         try:
-            res = str(rate)
-
-            if int(rate) == float(rate):
-                return f'{int(rate)} гривен'
-
-            if len(res) == 3 and len(str(int(rate))) == 1 or len(res) == 4 and len(str(int(rate))) == 2:
-                res = f'{res}0'
-                return f'{res.replace(".", " гривен ")} копеек'
-
-            if len(res) == 4 and len(str(int(rate))) == 1 or len(res) == 5 and len(str(int(rate))) == 2:
-                return f'{res.replace(".", " гривен ")} копеек'
+            rate = round(float_num, 2)
+            res = f'{str(rate)}0' if len(str(rate).split('.')[1]) == 1 else str(rate)
+            return f'{int(rate)} гривен' if int(rate) == float(rate) else f'{res.replace(".", " гривен ")} копеек'
         except ValueError:
             pass
 
@@ -483,9 +468,7 @@ class ExchangeRates:
         key = 'usd'
         currency = 'доллара'
 
-        if 'доллар' in self.commandline:
-            key, currency = 'usd', 'доллара'
-        elif 'евро' in self.commandline:
+        if 'евро' in self.commandline:
             key, currency = 'eur', 'евро'
         elif 'злот' in self.commandline or 'польск' in self.commandline:
             key, currency = 'pln', 'польского злотого'
@@ -495,12 +478,12 @@ class ExchangeRates:
     def get_exchange_rates(self):
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
         currency_key, currency = self.determine_the_currency()
+        url = f'https://minfin.com.ua/currency/banks/{currency_key}/'
 
         try:
-            url = f'https://minfin.com.ua/currency/banks/{currency_key}/'
             r = requests.get(url)
             if r.status_code != 200:
-                print(f'Status code: {r.status_code} !!!')
+                print(f'  Status code: {r.status_code} !!!')
                 return talk('Упс! Целевой сервер не отвечает.')
 
             soup = BeautifulSoup(r.text, 'html.parser')
@@ -796,7 +779,7 @@ class AssistantSettings:
 
         with open('settings.ini', 'w') as f:
             f.write(new_data)
-        print(new_param)
+        print(f'  {new_param}')
 
         if category == 'Speech':
             talk('Мои настройки г+олоса будут изменены!')
@@ -846,7 +829,7 @@ class AssistantSettings:
                                       encoding='utf-8',
                                       shell=True)
             volume_val = re.sub(r'[][]', '', volume_str)
-            print(f'Громкость: {volume_val.strip()}')
+            print(f'  Громкость: {volume_val.strip()}')
             return talk(random.choice(dg.done))
 
 
@@ -858,8 +841,7 @@ class ScriptStarter:
         self.intersection = intersection
 
     def get_script(self) -> tuple[str, str]:
-        script = None
-        script_name = ''.join(self.script_key.split('_')[-1])
+        script, script_name = None, ''.join(self.script_key.split('_')[-1])
 
         if script_name == 'nmstart' and self.intersection == 3 \
                 or script_name == 'cleancashe' and self.intersection == 2:
