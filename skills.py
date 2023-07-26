@@ -932,7 +932,7 @@ class FileLife:
     note_dir = os.path.abspath('notebook')
 
     @staticmethod
-    def file_name_assignment(path: str, name=None) -> str:
+    def file_name_assignment(path: str, name='') -> str:
         print(f'"{path}"')
         file_name = name
 
@@ -959,7 +959,7 @@ class FileLife:
         print()
         f.close()
 
-    def create_file(self, name=None, data=None) -> bool:
+    def create_file(self, name='', data='') -> bool:
         file_name = self.file_name_assignment(self.note_dir, name)
 
         file = open(f'{self.note_dir}/{file_name}', 'w+')
