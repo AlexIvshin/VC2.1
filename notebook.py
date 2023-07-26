@@ -4,7 +4,7 @@ import os
 from dialog import notebook_action_dict, yes_no_dict
 from assistant import Assistant, stack
 from skills import FileLife
-from typing import Optional
+from typing import Union
 from wordstonum import word2num_ru as w2n
 import utils as tls
 
@@ -79,7 +79,7 @@ def file_existence_and_clear_stack(function) -> ():
     return wrapper
 
 
-def choice_file(num=None) -> Optional[None, str]:
+def choice_file(num=None) -> Union[None, str, list[str]]:
     global file
     files = os.listdir(note_dir)
 

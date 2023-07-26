@@ -93,7 +93,7 @@ def choice_action(command: str, d: dict) -> tuple:
         return None, None
 
 
-def check_prg(command: str) -> Optional[None, str]:  # Определяем програму и её наличие в системе
+def check_prg(command: str):  # Определяем програму и её наличие в системе
     prg = ''.join([key for key, value in dg.programs_dict.items() if set(value) & set(command.split(' '))])
 
     if prg and call(f'which {prg} >/dev/null', shell=True) != 0:

@@ -415,7 +415,7 @@ class Polyhistor:
         return random.choice(joke)
 
     @staticmethod
-    def get_fact() -> Optional[None, str]:
+    def get_fact() -> Optional[Any]:
         if not tls.check_internet():
             return
         f = randfacts.get_fact(False)
@@ -945,7 +945,7 @@ class FileLife:
 
             if os.path.isfile(f'{path}/{file_name}'):
                 talk('Файл с таким именем уже существует. Необходимо выбрать другое имя!')
-                file_name = None
+                file_name = ''
                 continue
 
             if file_name == '':
@@ -969,7 +969,7 @@ class FileLife:
         return True
 
     def rename_file(self, old_name: str) -> None:
-        new_file_name = self.file_name_assignment(self.note_dir)
+        new_file_name = self.file_name_assignment(self.note_dir, get_input(old_name))
         old_file = os.path.join(self.note_dir, old_name)
         new_file = os.path.join(self.note_dir, new_file_name)
         tls.answer_ok_and_pass()
