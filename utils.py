@@ -7,6 +7,9 @@ import sys
 import os
 from bs4 import BeautifulSoup
 import re
+
+from typing import Optional
+
 import dialog as dg
 from assistant import Assistant
 
@@ -39,7 +42,7 @@ def xterm_x_position(geom_w: int) -> int:
     return int((get_displaysize()[0] - geom_w * 10) / 2)
 
 
-def choice_xterm(category) -> str:
+def choice_xterm(category: str) -> str:
     import configparser
     import pathlib
 
@@ -62,21 +65,21 @@ def choice_xterm(category) -> str:
     return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
 
 
-def restart_app():
+def restart_app() -> None:
     talk('Перезагружаюсь!')  # Ключевая фраза которая ловится в start_app.py
     sys.exit()
 
 
-def check_yesno_onoff(command, dictionary: dict) -> str:
+def check_yesno_onoff(command: str, dictionary: dict) -> str:
     return ''.join([key for key, value in dictionary.items() if set(value) & set(command.split(' '))])
 
 
-def check_hand_input(words):
+def check_hand_input(words: str) -> None:
     input_words = ['ручной', 'клавиатура', 'клавиатуры', 'ввод', 'вот', 'ручную']
     talk('Жду ввода с клавиатуры!') if len(set(words.split(' ')) & set(input_words)) > 1 else None
 
 
-def choice_action(command, d: dict) -> tuple:
+def choice_action(command: str, d: dict) -> tuple:
     max_intersection, action = 0, None
 
     for key, value in d.items():
@@ -90,7 +93,7 @@ def choice_action(command, d: dict) -> tuple:
         return None, None
 
 
-def check_prg(command) -> str:  # Определяем програму и её наличие в системе
+def check_prg(command: str) -> Optional[None, str]:  # Определяем програму и её наличие в системе
     prg = ''.join([key for key, value in dg.programs_dict.items() if set(value) & set(command.split(' '))])
 
     if prg and call(f'which {prg} >/dev/null', shell=True) != 0:
@@ -99,7 +102,7 @@ def check_prg(command) -> str:  # Определяем програму и её 
     return prg
 
 
-def check_word_sequence(command, words) -> bool:  # Проверяем идут ли слова вхождения одно за другим
+def check_word_sequence(command: str, words: list) -> bool:  # Проверяем идут ли слова вхождения одно за другим
     indexes_words: list = []
     [indexes_words.append(command.split(' ').index(i)) for i in words]  # список индексов слов вхождения
     indexes_words.sort()  # сортируем список
@@ -113,19 +116,19 @@ def answer_ok_and_pass(answer=True, enter_pass=False) -> None:
         talk(random.choice(dg.enter_pass_answer))
 
 
-def get_intersection_word(act, cmd, d: dict) -> list:
+def get_intersection_word(act: str, cmd: str, d: dict) -> list:
     isection_words = []
     [isection_words.append(word) if word == i else None for i in cmd.split(' ') for word in d[act]]
     return isection_words
 
 
-def get_meat(act, cmd, d: dict) -> str:  # Возвращает остаток строки после последнего вхождения
+def get_meat(act: str, cmd: str, d: dict) -> str:  # Возвращает остаток строки после последнего вхождения
     split_cmd = cmd.split(' ')
     isection_words = get_intersection_word(act, cmd, d)
     return ' '.join(split_cmd[split_cmd.index(isection_words[-1]) + 1:]) if isection_words else None
 
 
-def get_ip() -> [str]:
+def get_ip() -> Optional[str]:
     try:
         url = "https://pr-cy.ru/browser-details/"
         r = requests.get(url)
@@ -164,7 +167,7 @@ def check_internet() -> bool:  # internet check feature
         return False
 
 
-def choice_mode(change_mode_cmd, var_mode='default') -> str:
+def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
     mode = var_mode
 
     if mode != sleep_mode and change_mode_cmd == notebook_cmd \

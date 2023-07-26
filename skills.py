@@ -21,6 +21,7 @@ from selenium.webdriver.chrome.options import Options
 from subprocess import run, check_output, call
 from tabulate import tabulate as tb
 import time
+from typing import Union, Optional, Any
 import webbrowser
 import wikipedia
 
@@ -77,13 +78,13 @@ class Calculator:
         self.n2 = self.check_type_num(calc_string[-1])
 
     @classmethod
-    def check_type_num(cls, n) -> int or float:
+    def check_type_num(cls, n) -> Union[float, int]:
         try:
             return float(n) if '.' in n else int(n)
         except ValueError:
             pass
 
-    def get_result(self):
+    def get_result(self) -> Union[None, float, int]:
         n1, operator, n2 = self.n1, self.operator, self.n2
         if not operator or not n1 or not n2:
             return
@@ -99,12 +100,12 @@ class Calculator:
             except ZeroDivisionError:
                 talk(f'Обнаружено деление на ноль!!!')
 
-    def tell_the_result(self):
+    def tell_the_result(self) -> None:
         result = self.get_result()
         if not result:
             return
 
-        def get_correct_float_res(float_num) -> str:
+        def get_correct_float_res(float_num: float) -> str:
             integer_string, decimal_string = str(float_num).split('.')[0], str(round(float_num, 3)).split('.')[1]
             decimal_title = ''
             if len(decimal_string) == 1:
@@ -139,7 +140,7 @@ class SearchEngine:
         self.action = action
         talk(random.choice(dg.answer_ok))
 
-    def get_result(self):
+    def get_result(self) -> None:
         print(f' Ищу: "{self.search_words}"')
 
         if 'гугл' in self.commandline:
@@ -150,14 +151,14 @@ class SearchEngine:
             return self.wiki_short_answer(self.search_words)
 
     @classmethod
-    def exception_words(cls, wiki_error=False):
+    def exception_words(cls, wiki_error=False) -> None:
         text = 'Упс! Что-то не так пошло! Скорее всего сеть отсутствует.'
         if wiki_error:
             text = 'Необходим более точный запрос!'
         talk(text)
 
     @classmethod
-    def google_search(cls, text):
+    def google_search(cls, text: str) -> None:
         driver = None
         url = 'http://www.google.com'
 
@@ -191,7 +192,7 @@ class SearchEngine:
             cls.exception_words()
 
     @classmethod
-    def wiki_search(cls, text):
+    def wiki_search(cls, text: str) -> None:
         try:
             result = wikipedia.search(text)
             page = wikipedia.page(result[0])
@@ -206,7 +207,7 @@ class SearchEngine:
             cls.exception_words(wiki_error=True)
 
     @classmethod
-    def wiki_short_answer(cls, text):
+    def wiki_short_answer(cls, text: str) -> None:
         try:
             result = wikipedia.summary(text, sentences=3)
             result = re.sub(r'[^A-zА-я́0123456789%)(.,`\'":;!?-—]', ' ', str(result)) \
@@ -310,7 +311,7 @@ class Sinoptik:
         self.split_commandline = commandline.split()
 
     @classmethod
-    def get_week_day(cls, number) -> int:
+    def get_week_day(cls, number: int) -> int:
         return date.isoweekday(datetime.date.today() + datetime.timedelta(days=number))
 
     def get_url(self) -> str:
@@ -322,7 +323,7 @@ class Sinoptik:
 
         talk('Не поняла, погода в каком городе?')
 
-    def get_weather_forecast(self):
+    def get_weather_forecast(self) -> None:
 
         if self.intersection < 2 or not tls.check_internet():
             return
@@ -395,7 +396,7 @@ class Polyhistor:
         self.commandline = commandline
 
     @staticmethod
-    def get_joke():
+    def get_joke() -> Optional[Any]:
         if not tls.check_internet():
             return
         url_joke = 'https://www.anekdot.ru/random/anekdot/'
@@ -414,7 +415,7 @@ class Polyhistor:
         return random.choice(joke)
 
     @staticmethod
-    def get_fact():
+    def get_fact() -> Optional[None, str]:
         if not tls.check_internet():
             return
         f = randfacts.get_fact(False)
@@ -430,7 +431,7 @@ class Polyhistor:
                 sayings.append(line.replace('\n', ''))
         return random.choice(sayings)
 
-    def get_result(self):
+    def get_result(self) -> None:
         try:
             result = None
             if 'анекдот' in self.commandline:
@@ -456,7 +457,7 @@ class ExchangeRates:
         self.commandline = commandline
 
     @staticmethod
-    def correct_value_rate(float_num) -> str:
+    def correct_value_rate(float_num: float) -> str:
         try:
             rate = round(float_num, 2)
             res = f'{str(rate)}0' if len(str(rate).split('.')[1]) == 1 else str(rate)
@@ -475,7 +476,7 @@ class ExchangeRates:
 
         return key, currency
 
-    def get_exchange_rates(self):
+    def get_exchange_rates(self) -> None:
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
         currency_key, currency = self.determine_the_currency()
         url = f'https://minfin.com.ua/currency/banks/{currency_key}/'
@@ -506,7 +507,7 @@ class ExchangeRates:
 
                 count += 1
 
-            max_len_bank_name = int(max(len_banks_names))
+            max_len_bank_name: int = max(len_banks_names)
             print()
             print(f'{current_date}{" " * (max_len_bank_name - len(str(current_date)))}  {currency_key.upper()}')
 
@@ -553,7 +554,7 @@ class Translators:
         return from_lang, to_lang
 
     @staticmethod
-    def get_google_translate(string, lang) -> str:
+    def get_google_translate(string: str, lang: str) -> str:
         from googletrans import Translator
 
         try:
@@ -578,7 +579,7 @@ class Translators:
             talk('Упс! Сервер не отвечает.')
             return ':('
 
-    def get_result(self):
+    def get_result(self) -> None:
         from_lang, to_lang = self.check_language()
 
         if self.reverse:
@@ -670,7 +671,7 @@ class SysInformer:
         return collect_info_dict
 
     @staticmethod
-    def print_info(dict_info: dict):
+    def print_info(dict_info: dict) -> None:
 
         for item in dict_info['info']:
             if item == "system_info":
@@ -714,7 +715,7 @@ class SysInformer:
                           f"\t- Local IP: {dict_info['info'][item][elem]['local_ip']}\n")
 
     @staticmethod
-    def sys_monitoring():
+    def sys_monitoring() -> None:
         core_temp_warning = 85.0
         core_temp_critical = 91.0
         gpu_temp_warning = 90.0
@@ -757,7 +758,7 @@ class SysInformer:
         print(f'-infolabele-■ Core temp: {core_temp}°     ■ GPU temp: {gpu_temp}°     ■ '
               f'Mem used: {ram_per_used}%     ■ SWAP Used: {swap_per_used}%     ■ Runtime: no process', end='')
 
-    def get_sysinfo(self):
+    def get_sysinfo(self) -> None:
         sysinfo = self.create_sysinfo()
         self.print_info(sysinfo)
 
@@ -772,7 +773,7 @@ class AssistantSettings:
         self.param = w2n(commandline)
 
     @staticmethod
-    def update_settings(old_param, new_param, category=''):
+    def update_settings(old_param, new_param, category: str = '') -> None:
         with open('settings.ini', 'r') as f:
             old_data = f.read()
             new_data = old_data.replace(old_param, new_param)
@@ -782,7 +783,7 @@ class AssistantSettings:
         print(f'  {new_param}')
 
         if category == 'Speech':
-            talk('Мои настройки г+олоса будут изменены!')
+            talk('Мои настройки го́лоса будут изменены!')
         elif category == 'Mic':
             talk('Настройки микрофона будут изменены!')
         else:
@@ -790,7 +791,7 @@ class AssistantSettings:
 
         tls.restart_app()
 
-    def change_conf_set(self):
+    def change_conf_set(self) -> None:
         config = configparser.ConfigParser()
         config.read("settings.ini")
         param = w2n(self.commandline)
@@ -808,7 +809,7 @@ class AssistantSettings:
             old_sensitivity = config['Mic']['mic_up']
             self.update_settings(f'mic_up={old_sensitivity}', f'mic_up={param}', category='Mic')
 
-    def change_volume(self):
+    def change_volume(self) -> None:
         value = w2n(self.commandline)
         check_done = False
 
@@ -850,7 +851,7 @@ class ScriptStarter:
             script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh'
         return script, script_name
 
-    def run_script(self):
+    def run_script(self) -> None:
         scr, scr_name = self.get_script()
         if not scr:
             return
@@ -907,7 +908,7 @@ class Anonimizer:
         except requests.exceptions.ConnectionError:
             talk('Похоже проблемы с интернетом!')
 
-    def start_stop_anonimizer(self):
+    def start_stop_anonimizer(self) -> None:
         if self.on_off == 'on':
             ipaddress = self.get_ip()
             print(f'Мой IP: {ipaddress}')
@@ -931,7 +932,7 @@ class FileLife:
     note_dir = os.path.abspath('notebook')
 
     @staticmethod
-    def file_name_assignment(path, name=None) -> str:
+    def file_name_assignment(path: str, name=None) -> str:
         print(f'"{path}"')
         file_name = name
 
@@ -952,13 +953,13 @@ class FileLife:
             else:
                 return file_name
 
-    def read_file(self, file):
+    def read_file(self, file: str) -> None:
         f = open(f'{self.note_dir}/{file}', 'r')
         [print(line, end='') for line in f]
         print()
         f.close()
 
-    def create_file(self, name=None, data=None):
+    def create_file(self, name=None, data=None) -> bool:
         file_name = self.file_name_assignment(self.note_dir, name)
 
         file = open(f'{self.note_dir}/{file_name}', 'w+')
@@ -967,14 +968,14 @@ class FileLife:
         file.close()
         return True
 
-    def rename_file(self, old_name):
+    def rename_file(self, old_name: str) -> None:
         new_file_name = self.file_name_assignment(self.note_dir)
         old_file = os.path.join(self.note_dir, old_name)
         new_file = os.path.join(self.note_dir, new_file_name)
         tls.answer_ok_and_pass()
         os.rename(old_file, new_file)
 
-    def create_memo_file(self, cmd):
+    def create_memo_file(self, cmd: str) -> bool:
         memo_data = get_input() if tls.check_hand_input(cmd) \
             else tls.get_meat('create_memo_file', cmd, dg.notebook_action_dict)
         if not memo_data:
@@ -988,11 +989,11 @@ class FileLife:
         if self.create_file(file_name, memo_data):
             talk('Мемо-файл создан!')
 
-    def edit_file(self, file):
+    def edit_file(self, file: str) -> None:
         tls.answer_ok_and_pass()
         run(f'kate {self.note_dir}/{file} &', shell=True)
 
-    def delete_file(self, file, permission=False):
+    def delete_file(self, file: str, permission=False) -> str:
         if permission:
             os.remove(f'{self.note_dir}/{file}')
             talk(random.choice(dg.done))

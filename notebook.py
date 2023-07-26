@@ -4,6 +4,7 @@ import os
 from dialog import notebook_action_dict, yes_no_dict
 from assistant import Assistant, stack
 from skills import FileLife
+from typing import Optional
 from wordstonum import word2num_ru as w2n
 import utils as tls
 
@@ -13,12 +14,12 @@ talk = Assistant().speaks
 homedir = file_action.homedir
 note_dir = file_action.note_dir
 
-cmdline = None
-file = None
-action = None
+cmdline: str = ''
+file: str = ''
+action: str = ''
 
 
-def files_list():
+def files_list() -> bool:
     files = os.listdir(note_dir)
     print(note_dir)
 
@@ -32,7 +33,7 @@ def files_list():
     return True
 
 
-def notebook_reacts(commandline):
+def notebook_reacts(commandline: str) -> None:
     global action, file, cmdline
 
     cmdline = commandline
@@ -42,7 +43,7 @@ def notebook_reacts(commandline):
     mem_stack: list = stack.get_stack()
 
     if yes_no == 'cancel':
-        file = None
+        file = ''
         return stack.clear_stack()
     print(f'Выбран файл: "{file}"') if file else None
 
@@ -60,10 +61,10 @@ def notebook_reacts(commandline):
         if mem_stack[-1] == 'delete_file':
             file_action.delete_file(file, permission=True)
             stack.clear_stack()
-            file = None
+            file = ''
 
 
-def file_existence(function):
+def file_existence(function) -> ():
     def wrapper():
         if not file:
             return choice_file()
@@ -71,14 +72,14 @@ def file_existence(function):
     return wrapper
 
 
-def file_existence_and_clear_stack(function):
+def file_existence_and_clear_stack(function) -> ():
     def wrapper():
         file_existence(function)
         stack.clear_stack()
     return wrapper
 
 
-def choice_file(num=None):
+def choice_file(num=None) -> Optional[None, str]:
     global file
     files = os.listdir(note_dir)
 
@@ -117,11 +118,11 @@ def delete_file():
     file_action.delete_file(file)
 
 
-def create_file():
+def create_file() -> bool:
     stack.clear_stack()
     return file_action.create_file()
 
 
-def create_memo_file():
+def create_memo_file() -> bool:
     stack.clear_stack()
     return file_action.create_memo_file(cmdline)

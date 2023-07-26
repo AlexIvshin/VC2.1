@@ -18,10 +18,10 @@ from vosk import Model, KaldiRecognizer, SetLogLevel
 
 
 class ShortTermMemory:
-    __limit = 2
-    __stack = []
+    __limit: int = 2
+    __stack: list = []
 
-    def ad_element(self, action):
+    def ad_element(self, action: str) -> None:
         if len(self.__stack) >= self.__limit:
             del self.__stack[0]
         self.__stack.append(action)
@@ -29,7 +29,7 @@ class ShortTermMemory:
     def get_stack(self) -> list:
         return self.__stack
 
-    def clear_stack(self):
+    def clear_stack(self) -> None:
         return self.__stack.clear()
 
 
@@ -42,11 +42,11 @@ class Assistant:
     config.read(config_path)
     mode = 'default'
 
-    def listening(self):
+    def listening(self) -> None:
         SetLogLevel(-1)
         q = queue.Queue()
 
-        def callback(indata, _frames, _time, status):
+        def callback(indata, _frames, _time, status) -> None:
             if status:
                 print(status, file=sys.stderr)
             q.put(bytes(indata))
@@ -105,14 +105,14 @@ class Assistant:
     def mic_sensitivity(cls, value: int) -> None:
         run(f'amixer -D pulse sset Capture {value}% >/dev/null', shell=True)
 
-    def speaks(self, words, print_str='',
+    def speaks(self, words: str, print_str: str = '',
                speech_pitch: int = config['Speech']['speech_pitch'],
                speech_rate: int = config['Speech']['speech_rate'],
                voice_profile: str = config['Speech']['voice_profile'],
                quality: str = config['Speech']['quality'],
-               mic_up: int = config['Mic']['mic_up']):
+               mic_up: int = config['Mic']['mic_up']) -> None:
 
-        def voice(text):
+        def voice(text: str) -> None:
             if print_str:
                 print(f'{print_str}')
             print(f'► {words.lstrip().replace("́", "")}')
@@ -125,7 +125,7 @@ class Assistant:
             
         return voice(words)
 
-    def reacts(self, command):
+    def reacts(self, command: str) -> None:
         import utils as tls
         import actionslib as alib
         from dialog import on_off_dict, yes_no_dict, actions_dict

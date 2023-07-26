@@ -26,7 +26,7 @@ class TextWrapper:
         self.label_field = label_field
         self.info_label_field = info_label_field
 
-    def get_output(self, text: str):
+    def get_output(self, text: str) -> None:
         input_color = '#99ff66'
         output_color = '#66b3ff'
 
@@ -69,10 +69,10 @@ class TextWrapper:
             self.text_field.tag_remove(rm_tag, index_str, 'end')
             self.text_field.tag_config(work_tag, foreground=color)
 
-    def write(self, text_: str):
+    def write(self, text_: str) -> None:
         self.get_output(text_)
 
-    def flush(self):
+    def flush(self) -> None:
         self.text_field.update()
         self.label_field.update()
         self.info_label_field.update()
@@ -124,7 +124,7 @@ class AppWidget:
     info_label.pack(expand=True, fill='x')
 
     @classmethod
-    def close_widget(cls):
+    def close_widget(cls) -> None:
         cls.root.quit()
         try:
             cls.root.destroy()
@@ -133,7 +133,7 @@ class AppWidget:
         sys.exit()
 
 
-def thread_monitoring():
+def thread_monitoring() -> None:
     sysmonitor = SysInformer()
     while True:
         if not thread.is_alive():
@@ -146,7 +146,7 @@ thread = Thread(target=Assistant().listening)  # Создаём главный �
 is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком.
 
 
-def main():
+def main() -> None:
     text = AppWidget.text
     label = AppWidget.label
     info_label = AppWidget.info_label

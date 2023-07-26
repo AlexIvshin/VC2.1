@@ -21,7 +21,7 @@ yes_no = ''
 global max_intersection_val, cmdline, command_word, function, on_off
 
 
-def yesno_action(yesno):
+def yesno_action(yesno: str) -> None:
     global last_function, last_cmdline, yes_no
     yes_no = yesno
 
@@ -32,7 +32,7 @@ def yesno_action(yesno):
         last_cmdline = ''
 
 
-def callfunc(command_line, action, maxintersect, onoff=None):
+def callfunc(command_line: str, action: str, maxintersect: int, onoff=None) -> None:
     global max_intersection_val, function, cmdline, command_word, on_off
     cmdline = command_line
     command_word = set(command_line.split(' '))
@@ -43,7 +43,7 @@ def callfunc(command_line, action, maxintersect, onoff=None):
     start_script(function) if 'start_script' in function else globals()[function]()
 
 
-def hello():
+def hello() -> None:
     if 'день' not in cmdline \
             and 'вечер' not in cmdline \
             and 'добрый' not in cmdline:
@@ -53,11 +53,11 @@ def hello():
             talk(random.choice(dg.hello_answer))
 
 
-def thanks_output():
+def thanks_output() -> None:
     talk(random.choice(dg.answer_thanks))
 
 
-def i_am_output():
+def i_am_output() -> None:
     if max_intersection_val > 1 and len(command_word) <= 3:
         intersection_word = tls.get_intersection_word(function, cmdline, dg.actions_dict)
 
@@ -66,43 +66,43 @@ def i_am_output():
 
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
-def mode_anonim():
+def mode_anonim() -> None:
     skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
 
 
-def start_script(foo_str):
+def start_script(foo_str: str) -> None:
     skills.ScriptStarter(foo_str, max_intersection_val).run_script()
 
 
-def search():
+def search() -> None:
     skills.SearchEngine(cmdline, function, max_intersection_val).get_result()
 
 
-def calculate():
+def calculate() -> None:
     skills.Calculator(cmdline, function).tell_the_result()
 
 
-def weather():
+def weather() -> None:
     skills.Sinoptik(cmdline, max_intersection_val).get_weather_forecast()
 
 
-def stop_app():
+def stop_app() -> None:
     talk(random.choice(dg.answer_goodby))
     sys.exit()
 
 
-def app_reboot():
+def app_reboot() -> None:
     tls.restart_app()
 
 
-def sys_down():
+def sys_down() -> None:
     if max_intersection_val >= 2:
         tls.answer_ok_and_pass()
         run(f'systemctl poweroff', shell=True)
         sys.exit()
 
 
-def sys_reboot():
+def sys_reboot() -> None:
     global last_cmdline, last_function
 
     if last_function == 'sys_reboot':
@@ -117,22 +117,22 @@ def sys_reboot():
         return 
 
 
-def conf_settings():
+def conf_settings() -> None:
     skills.AssistantSettings(cmdline).change_conf_set()
 
 
-def volume_settings():
+def volume_settings() -> None:
     skills.AssistantSettings(cmdline).change_volume()
 
 
-def random_joke():
+def random_joke() -> None:
     global last_cmdline, last_function
     last_function = 'random_joke'
     last_cmdline = cmdline
     skills.Polyhistor(cmdline, max_intersection_val).get_result()
 
 
-def show_sys_info():
+def show_sys_info() -> None:
     if max_intersection_val < 3:
         return
     tls.answer_ok_and_pass()
@@ -140,5 +140,5 @@ def show_sys_info():
     run(f'{tls.choice_xterm("XtermInfo")} python3 {puth} &', shell=True)
 
 
-def exchange_rates():
+def exchange_rates() -> None:
     skills.ExchangeRates(cmdline, max_intersection_val).get_exchange_rates()

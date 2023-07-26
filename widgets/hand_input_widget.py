@@ -3,9 +3,9 @@ import tkinter as tk
 input_text = ''
 
 
-def keyboard_input(entry_text=''):
+def keyboard_input(entry_text: str = '') -> None:
 
-    def get_entry():
+    def get_entry() -> None:
         global input_text
         input_text = entry.get().replace(' › ', '')
         entry.delete(0, 'end')
@@ -13,9 +13,9 @@ def keyboard_input(entry_text=''):
 
     input_window = tk.Tk()
     displaysize_x = input_window.winfo_screenwidth()
-    w = 700
-    h = 35
-    y = 350
+    w: int = 700
+    h: int = 35
+    y: int = 350
     x = int((displaysize_x - w) / 2)
     input_window.geometry(f"{w}x{h}+{x}+{y}")
     input_window.title('hand input')
@@ -52,7 +52,7 @@ def keyboard_input(entry_text=''):
     input_window.mainloop()
 
 
-def get_input(text=''):
+def get_input(text='') -> str:
     keyboard_input(text)
     print(input_text)
     return input_text
