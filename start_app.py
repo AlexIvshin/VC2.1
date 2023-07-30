@@ -89,13 +89,13 @@ class AppWidget:
     root.resizable(False, False)
     root.wait_visibility(root)
     root.wm_attributes("-alpha", 0.8)
-    root.configure(border=2)
+    # root.configure(border=2)
 
     label = tk.Label(root,
                      text='VCom 2.1',
                      background='#090c10',
                      foreground='#53ff1a',
-                     font='Hack 9',
+                     font='Hack 7',
                      anchor='center',
                      padx=7)
     label.pack(fill='x')
@@ -107,18 +107,18 @@ class AppWidget:
                    selectbackground='#303d30',
                    highlightthickness=0,
                    insertwidth=0,
-                   font='Hack 10',
+                   font='Hack 9',
                    wrap='word',
                    padx=7)
     text.mark_set('insert', 'end')
     text.pack(fill='x')
 
     info_label = tk.Label(root,
-                          border='1', relief='flat',
+                          # border='1', relief='flat',
                           compound="bottom",
                           background='#000000',
                           foreground='#00cc00',
-                          font='Hack 8',
+                          font='Hack 7',
                           anchor='w',
                           padx=7)
     info_label.pack(expand=True, fill='x')

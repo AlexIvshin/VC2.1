@@ -756,8 +756,8 @@ class SysInformer:
         if gpu_temp >= gpu_temp_critical:
             talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {int(round(gpu_temp, 0))}°!')
 
-        print(f'-infolabele-■ Core temp: {core_temp}°     ■ GPU temp: {gpu_temp}°     ■ '
-              f'Mem used: {ram_per_used}%     ■ SWAP Used: {swap_per_used}%     ■ Runtime: no process', end='')
+        print(f'-infolabele-■ Core temp: {core_temp}°  ■ GPU temp: {gpu_temp}°  ■ '
+              f'Mem used: {ram_per_used}%  ■ SWAP Used: {swap_per_used}%  ■ Runtime: no process', end='')
 
     def get_sysinfo(self) -> None:
         sysinfo = self.create_sysinfo()
