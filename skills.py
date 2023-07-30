@@ -319,6 +319,7 @@ class Sinoptik:
             for key in self.cities:
                 if key in word:
                     talk(random.choice(dg.answer_ok))
+
                     return f'{self.site_url}/погода-{self.cities[key]}'
 
         talk('Не поняла, погода в каком городе?')
