@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-
-import random
-import requests
+import os
 from subprocess import check_output, call
 import sys
-import os
+import random
+
 from bs4 import BeautifulSoup
 import re
+import requests
 
 from typing import Optional
 
@@ -172,7 +172,6 @@ def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
 
     if mode != sleep_mode and change_mode_cmd == notebook_cmd \
             or mode == notebook_mode and change_mode_cmd != default_cmd:
-
         if change_mode_cmd == notebook_cmd:
             talk('Режим блокнота активирован!')
         print('Mode: Notebook', end='')

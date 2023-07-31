@@ -30,22 +30,23 @@ def keyboard_input(entry_text: str = '') -> None:
                      insertbackground='#121721',
                      insertwidth=1,
                      highlightcolor='#242e42',
-                     foreground='#53ff1a',
-                     font='Hack 9',
-                     width=88)
+                     foreground='#aab3a8',
+                     font='Arial 10',
+                     width=68)
     entry.insert(0, ' › ' + entry_text)
     entry.focus_set()
     entry.pack(side='left', padx=5, ipady=3)
 
     btn = tk.Button(input_window,
                     command=get_entry,
-                    border='1', relief='flat',
-                    text='OK',
-                    font='Arial 8',
-                    activebackground='#090c10',
-                    background='#121721',
-                    activeforeground='#ffffff',
-                    foreground='#53ff1a',
+                    border='0',
+                    highlightthickness=0,
+                    text='Enter',
+                    font='Arial 9',
+                    activebackground='#2a3242',
+                    background='#1a212e',
+                    activeforeground='#53ff1a',
+                    foreground='#389918',
                     width=5)
     btn.pack(side='right', padx=5)
 
