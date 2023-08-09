@@ -157,7 +157,7 @@ def thread_monitoring() -> None:
         if not thread.is_alive():
             return AppWidget.close_widget()
         # Определяем выполняется ли скрипт '*.sh' в XTERM.
-        # Для корректной работы расширение файла скрипта обязательно 'sh'.
+        # Для корректной работы, расширение файла скрипта обязательно 'sh'!
         check_run_scr()
         sysmonitor.sys_monitoring()  # Слежка за системой.
         time.sleep(2)
