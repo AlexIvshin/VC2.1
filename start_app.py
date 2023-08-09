@@ -7,6 +7,7 @@ import tkinter as tk
 from contextlib import redirect_stdout
 from threading import Thread
 import time
+from subprocess import call
 
 from assistant import Assistant
 from skills import SysInformer
@@ -17,6 +18,8 @@ import pathlib
 config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
 config = configparser.ConfigParser()
 config.read(config_path)
+run_script = False
+ps_name = 'xterm'
 
 
 class TextWrapper:
@@ -133,13 +136,32 @@ class AppWidget:
         sys.exit()
 
 
+def check_run_scr() -> None:
+    global run_script
+    if call(f'ps -a | grep -w {ps_name} >/dev/null', shell=True) == 0:
+        run_script = True
+        
+
+def check_completed_scr() -> None:
+    global run_script
+    if call(f'ps -a | grep -w {ps_name} >/dev/null', shell=True) == 1:
+        talk = Assistant().speaks
+        talk(' Скрипт выполнен!', print_str=f'  Script done completed!')
+        run_script = False
+
+
 def thread_monitoring() -> None:
     sysmonitor = SysInformer()
     while True:
         if not thread.is_alive():
             return AppWidget.close_widget()
+
+        check_run_scr()  # Определяем выполняется ли скрипт в XTERM
+        if run_script:
+            check_completed_scr()  # Определяем завершение работы скрипта
+
         sysmonitor.sys_monitoring()  # Слежка за системой.
-        time.sleep(10)
+        time.sleep(2)
 
 
 thread = Thread(target=Assistant().listening)  # Создаём главный поток.

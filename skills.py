@@ -847,22 +847,21 @@ class ScriptStarter:
 
         if script_name == 'nmstart' and self.intersection == 3 \
                 or script_name == 'cleancashe' and self.intersection == 2:
-            script = f'{tls.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh'
+            script = f'{tls.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh &'
         elif script_name == 'sysfullupgrade' and self.intersection == 2:
-            script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh'
+            script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh &'
         return script, script_name
 
     def run_script(self) -> None:
         scr, scr_name = self.get_script()
         if not scr:
             return
+
         print(f'  Script: "{scr_name}"')
         tls.answer_ok_and_pass()
         if 'sudo' in scr:
             tls.answer_ok_and_pass(answer=False, enter_pass=True)
-        mic_sins(0)
         run(scr, shell=True)
-        talk(random.choice(dg.done))
 
 
 class Anonimizer:

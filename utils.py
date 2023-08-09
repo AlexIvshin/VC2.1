@@ -59,7 +59,7 @@ def choice_xterm(category: str) -> str:
     if ctgr == 'XtermInfo':
         pos_x, pos_y = 10, 20
     else:
-        pos_x, pos_y = xterm_x_position(x), 350
+        pos_x, pos_y = xterm_x_position(x), 370
 
     hold = '-hold' if ctgr in category_list[2:] else ''
     return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
