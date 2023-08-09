@@ -7,7 +7,7 @@ import tkinter as tk
 from contextlib import redirect_stdout
 from threading import Thread
 import time
-from subprocess import call
+import subprocess as sub
 
 from assistant import Assistant
 from skills import SysInformer
@@ -18,8 +18,7 @@ import pathlib
 config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
 config = configparser.ConfigParser()
 config.read(config_path)
-run_script = False
-ps_name = 'xterm'
+run_script: bool = False
 
 
 class TextWrapper:
@@ -138,15 +137,17 @@ class AppWidget:
 
 def check_run_scr() -> None:
     global run_script
-    if call(f'ps -a | grep -w {ps_name} >/dev/null', shell=True) == 0:
+    try:
+        pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ".sh" ', encoding='utf-8', shell=True)
+        scr_name = pgrep_str.split('/')[-1]
         run_script = True
-        
+    except sub.CalledProcessError:
+        scr_name = ''
+        pass
 
-def check_completed_scr() -> None:
-    global run_script
-    if call(f'ps -a | grep -w {ps_name} >/dev/null', shell=True) == 1:
+    if run_script and not scr_name:
         talk = Assistant().speaks
-        talk(' Скрипт выполнен!', print_str=f'  Script done completed!')
+        talk(' Скрипт выполнен!', print_str=f'  Script: Done completed!')
         run_script = False
 
 
@@ -155,11 +156,9 @@ def thread_monitoring() -> None:
     while True:
         if not thread.is_alive():
             return AppWidget.close_widget()
-
-        check_run_scr()  # Определяем выполняется ли скрипт в XTERM
-        if run_script:
-            check_completed_scr()  # Определяем завершение работы скрипта
-
+        # Определяем выполняется ли скрипт '*.sh' в XTERM.
+        # Для корректной работы расширение файла скрипта обязательно 'sh'.
+        check_run_scr()
         sysmonitor.sys_monitoring()  # Слежка за системой.
         time.sleep(2)
 

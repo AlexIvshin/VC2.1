@@ -856,11 +856,10 @@ class ScriptStarter:
         scr, scr_name = self.get_script()
         if not scr:
             return
-
-        print(f'  Script: "{scr_name}"')
         tls.answer_ok_and_pass()
         if 'sudo' in scr:
             tls.answer_ok_and_pass(answer=False, enter_pass=True)
+        print(f'  Script: "{scr_name}.sh"')
         run(scr, shell=True)
 
 
