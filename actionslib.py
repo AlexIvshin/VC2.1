@@ -32,6 +32,31 @@ def yesno_action(yesno: str) -> None:
         last_cmdline = ''
 
 
+def confirm_action(foo_name: str, isection: int) -> None:
+    global last_cmdline, last_function
+    if max_intersection_val >= isection:
+        talk(f'Вы уверены?')
+        last_function = foo_name
+        last_cmdline = cmdline
+        return
+
+
+def reboot_down(action: str) -> None:
+    command = f'echo "No command!"'
+
+    if last_function == action:
+        if action == 'sys_down':
+            command = f'systemctl poweroff'
+        elif action == 'sys_reboot':
+            command = f'systemctl reboot'
+
+        tls.answer_ok_and_pass()
+        run(command, shell=True)
+        sys.exit()
+
+    confirm_action(action, 2)
+
+
 def callfunc(command_line: str, action: str, maxintersect: int, onoff=None) -> None:
     global max_intersection_val, function, cmdline, command_word, on_off
     cmdline = command_line
@@ -67,7 +92,8 @@ def i_am_output() -> None:
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
 def mode_anonim() -> None:
-    skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
+    # skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
+    talk(f'Функция пока не доступна')
 
 
 def start_script(foo_str: str) -> None:
@@ -96,25 +122,11 @@ def app_reboot() -> None:
 
 
 def sys_down() -> None:
-    if max_intersection_val >= 2:
-        tls.answer_ok_and_pass()
-        run(f'systemctl poweroff', shell=True)
-        sys.exit()
+    reboot_down('sys_down')
 
 
 def sys_reboot() -> None:
-    global last_cmdline, last_function
-
-    if last_function == 'sys_reboot':
-        tls.answer_ok_and_pass()
-        run(f'systemctl reboot', shell=True)
-        sys.exit()
-
-    if max_intersection_val >= 2:
-        talk(f'Вы уверены?')
-        last_function = 'sys_reboot'
-        last_cmdline = cmdline
-        return 
+    reboot_down('sys_reboot')
 
 
 def conf_settings() -> None:
