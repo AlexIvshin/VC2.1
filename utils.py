@@ -74,9 +74,11 @@ def check_yesno_onoff(command: str, dictionary: dict) -> str:
     return ''.join([key for key, value in dictionary.items() if set(value) & set(command.split(' '))])
 
 
-def check_hand_input(words: str) -> None:
+def check_hand_input(words: str) -> bool:
     input_words = ['ручной', 'клавиатура', 'клавиатуры', 'ввод', 'вот', 'ручную']
-    talk('Жду ввода с клавиатуры!') if len(set(words.split(' ')) & set(input_words)) > 1 else None
+    if len(set(words.split(' ')) & set(input_words)) > 1:
+        talk('Жду ввода с клавиатуры!')
+        return True
 
 
 def choice_action(command: str, d: dict) -> tuple:

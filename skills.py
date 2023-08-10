@@ -680,47 +680,47 @@ class SysInformer:
 
                     if elem == 'system':
                         print(f"[+] Информация о системе\n"
-                              f"\t- Имя компьютера: {dict_info['info'][item][elem]['comp_name']}\n"
-                              f"\t- Опереционная система: {dict_info['info'][item][elem]['os_name']}\n"
-                              f"\t- Сборка: {dict_info['info'][item][elem]['version']}\n"
-                              f"\t- Архитектура: {dict_info['info'][item][elem]['machine']}\n")
+                              f"  - Имя компьютера: {dict_info['info'][item][elem]['comp_name']}\n"
+                              f"  - Опереционная система: {dict_info['info'][item][elem]['os_name']}\n"
+                              f"  - Сборка: {dict_info['info'][item][elem]['version']}\n"
+                              f"  - Архитектура: {dict_info['info'][item][elem]['machine']}\n")
 
                     if elem == 'processor':
                         print(f"[+] Информация о процессоре\n"
-                              f"\t- Семейство: {dict_info['info'][item][elem]['name']}\n"
-                              f"\t- Физические ядра: {dict_info['info'][item][elem]['phisycal_core']}\n"
-                              f"\t- Всего ядер: {dict_info['info'][item][elem]['all_core']}\n"
-                              f"\t- Максимальная частота: {dict_info['info'][item][elem]['freq_max']}\n")
+                              f"  - Семейство: {dict_info['info'][item][elem]['name']}\n"
+                              f"  - Физические ядра: {dict_info['info'][item][elem]['phisycal_core']}\n"
+                              f"  - Всего ядер: {dict_info['info'][item][elem]['all_core']}\n"
+                              f"  - Максимальная частота: {dict_info['info'][item][elem]['freq_max']}\n")
 
                     if elem == 'ram':
                         print(f"[+] Оперативная память\n"
-                              f"\t- Объем: {dict_info['info'][item][elem]['volume']}\n"
-                              f"\t- Доступно: {dict_info['info'][item][elem]['aviable']}\n"
-                              f"\t- Используется: {dict_info['info'][item][elem]['used']}\n")
+                              f"  - Объем: {dict_info['info'][item][elem]['volume']}\n"
+                              f"  - Доступно: {dict_info['info'][item][elem]['aviable']}\n"
+                              f"  - Используется: {dict_info['info'][item][elem]['used']}\n")
 
             if item == "disk_info":
                 for elem in dict_info['info'][item]:
                     print(f"[+] Информация о дисках\n"
-                          f"\t- Имя диска: {elem}\n"
-                          f"\t- Файловая система: {dict_info['info'][item][elem]['file_system']}\n"
-                          f"\t- Объем диска: {dict_info['info'][item][elem]['size_total']}\n"
-                          f"\t- Занято: {dict_info['info'][item][elem]['size_used']}\n"
-                          f"\t- Свободно: {dict_info['info'][item][elem]['size_free']}\n"
-                          f"\t- Заполненность: {dict_info['info'][item][elem]['percent']}%\n")
+                          f"  - Имя диска: {elem}\n"
+                          f"  - Файловая система: {dict_info['info'][item][elem]['file_system']}\n"
+                          f"  - Объем диска: {dict_info['info'][item][elem]['size_total']}\n"
+                          f"  - Занято: {dict_info['info'][item][elem]['size_used']}\n"
+                          f"  - Свободно: {dict_info['info'][item][elem]['size_free']}\n"
+                          f"  - Заполненность: {dict_info['info'][item][elem]['percent']}%\n")
 
             if item == "net_info":
                 for elem in dict_info['info'][item]:
                     print(f"[+] Информация о сети\n"
-                          f"\t- Имя интерфейса: {elem}\n"
-                          f"\t- MAC-адрес: {dict_info['info'][item][elem]['mac']}\n"
-                          f"\t- Local IP: {dict_info['info'][item][elem]['local_ip']}\n")
+                          f"  - Имя интерфейса: {elem}\n"
+                          f"  - MAC-адрес: {dict_info['info'][item][elem]['mac']}\n"
+                          f"  - Local IP: {dict_info['info'][item][elem]['local_ip']}\n")
 
     @staticmethod
     def sys_monitoring() -> None:
-        core_temp_warning = 85.0
-        core_temp_critical = 91.0
-        gpu_temp_warning = 90.0
-        gpu_temp_critical = 95.0
+        core_temp_warning = 90.0
+        core_temp_critical = 95.0
+        gpu_temp_warning = 93.0
+        gpu_temp_critical = 98.0
         ram_per_warning = 90.0
         ram_per_critical = 98.0
         gpus = GPUtil.getGPUs()
@@ -859,7 +859,7 @@ class ScriptStarter:
         tls.answer_ok_and_pass()
         if 'sudo' in scr:
             tls.answer_ok_and_pass(answer=False, enter_pass=True)
-        print(f'  Script: "{scr_name}.sh"')
+        print(f'  Script: run {scr_name}.sh')
         run(scr, shell=True)
 
 

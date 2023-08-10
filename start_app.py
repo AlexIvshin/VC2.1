@@ -19,6 +19,7 @@ config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
 config = configparser.ConfigParser()
 config.read(config_path)
 run_script: bool = False
+num_scripts_to_run = 0
 
 
 class TextWrapper:
@@ -136,29 +137,43 @@ class AppWidget:
 
 
 def check_run_scr() -> None:
-    global run_script
+    """
+    This function monitors the execution of scripts in the system.
+    (only reacts to files with "sh" extension)
+    Эта функция мониторит выполнение скриптов в системе.
+    (реагирует только на файлы с расширением "sh")
+    """
+    global run_script, num_scripts_to_run
+    run_scripts = []
+
+    def report_completion() -> None:
+        talk = Assistant().speaks
+        talk(' Скрипт выполнен!', print_str=f'  Script: Completed!')
+
     try:
-        pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ".sh" ', encoding='utf-8', shell=True)
-        scr_name = pgrep_str.split('/')[-1]
+        pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ".sh" ', encoding='utf-8', shell=True).strip()
+        [run_scripts.append(i.split('/')[-1]) for i in pgrep_str.split('\n')]
+        n = len(run_scripts)
+        if num_scripts_to_run > n:
+            report_completion()
+        num_scripts_to_run = n
         run_script = True
+
     except sub.CalledProcessError:
-        scr_name = ''
+        num_scripts_to_run = 0
         pass
 
-    if run_script and not scr_name:
-        talk = Assistant().speaks
-        talk(' Скрипт выполнен!', print_str=f'  Script: Done completed!')
+    if run_script and num_scripts_to_run == 0:
         run_script = False
+        report_completion()
 
 
 def thread_monitoring() -> None:
     sysmonitor = SysInformer()
     while True:
-        if not thread.is_alive():
+        if not thread.is_alive():  # Слежка за за главным потоком.
             return AppWidget.close_widget()
-        # Определяем выполняется ли скрипт '*.sh' в XTERM.
-        # Для корректной работы, расширение файла скрипта обязательно 'sh'!
-        check_run_scr()
+        check_run_scr()  # Слежка за выполнением скриптов в системе.
         sysmonitor.sys_monitoring()  # Слежка за системой.
         time.sleep(2)
 
