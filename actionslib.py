@@ -83,7 +83,7 @@ def thanks_output() -> None:
 
 
 def i_am_output() -> None:
-    if max_intersection_val > 1 and len(command_word) <= 3:
+    if max_intersection_val > 1 and len(command_word) < 4:
         intersection_word = tls.get_intersection_word(function, cmdline, dg.actions_dict)
 
         if tls.check_word_sequence(cmdline, intersection_word):
@@ -93,7 +93,6 @@ def i_am_output() -> None:
 # Пускаем весь интернет-трафик через Tor + toriptables2
 def mode_anonim() -> None:
     skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
-    # talk(f'Функция пока не доступна')
 
 
 def start_script(foo_str: str) -> None:
