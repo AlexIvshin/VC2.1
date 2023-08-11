@@ -870,15 +870,21 @@ class Anonimizer:
         path_tor = '/usr/sbin/tor'
         path_toriptables2 = '/usr/local/bin/toriptables2.py'
         path_python2 = '/usr/bin/python2'
+        path_iptables = '/usr/sbin/iptables'
 
         if not os.path.isfile(path_tor):
             talk('Тор в системе не обнаружен!')
-            print('Для установки Tor выполнить: <sudo apt-get install tor>')
+            print('Для установки Tor, выполнить: <sudo apt install tor>')
+            return False
+
+        if not os.path.isfile(path_iptables):
+            talk('Айпи тэйбл в системе не обнаружен!')
+            print('Для установки iptables, выполнить: <sudo apt install iptables>')
             return False
 
         if not os.path.isfile(path_toriptables2):
-            talk('Тор-айпи-тэйбл в системе не обнаружен! Для установки, следуйте инструкции!')
-            print('Для установки toriptables2 выполнить в терминале:')
+            talk('Тор айпи тэйбл в системе не обнаружен! Для установки, следуйте инструкции!')
+            print('Для установки toriptables2, выполнить в терминале:')
             print('1) <git clone https://github.com/ruped24/toriptables2>')
             print('2) <cd toriptables2/>')
             print('3) <sudo mv toriptables2.py /usr/local/bin/>')
@@ -899,30 +905,29 @@ class Anonimizer:
 
     @staticmethod
     def get_ip() -> str:
-        get_ip_url = 'https://api.ipify.org'
+        url = 'https://check.torproject.org/api/ip'
         try:
-            response = requests.get(get_ip_url)
-            ip_address = response.text
-            return ip_address
+            my_public_ip = requests.get(url).json()['IP']
+            return my_public_ip
         except requests.exceptions.ConnectionError:
             talk('Похоже проблемы с интернетом!')
 
     def start_stop_anonimizer(self) -> None:
         if self.on_off == 'on':
             ipaddress = self.get_ip()
-            print(f'Мой IP: {ipaddress}')
+            print(f'  Мой IP: {ipaddress}')
             tls.answer_ok_and_pass(enter_pass=True)
             mic_sins(0)
             run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -l', shell=True)
             new_ipaddress = self.get_ip()
-            print(f'Мой новый IP: {new_ipaddress}')
+            print(f'  Мой новый IP: {new_ipaddress}')
             return talk('Упс! Не вышло') if ipaddress == new_ipaddress else talk(random.choice(dg.done))
 
         if self.on_off == 'off':
             tls.answer_ok_and_pass(enter_pass=True)
             mic_sins(0)
             run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -f', shell=True)
-            print(f'Мой IP: {self.get_ip()}')
+            print(f'  Мой IP: {self.get_ip()}')
             return talk(random.choice(dg.done))
 
 

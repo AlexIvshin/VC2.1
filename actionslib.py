@@ -92,8 +92,8 @@ def i_am_output() -> None:
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
 def mode_anonim() -> None:
-    # skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
-    talk(f'Функция пока не доступна')
+    skills.Anonimizer(max_intersection_val, on_off).start_stop_anonimizer()
+    # talk(f'Функция пока не доступна')
 
 
 def start_script(foo_str: str) -> None:

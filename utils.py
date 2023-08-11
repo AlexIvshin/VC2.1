@@ -4,18 +4,12 @@ from subprocess import check_output, call
 import sys
 import random
 
-from bs4 import BeautifulSoup
-import re
-import requests
-
-from typing import Optional
-
 import dialog as dg
 from assistant import Assistant
 
 talk = Assistant().speaks
 
-# Режимы
+# Режимы и команды смены режима используются в choice_mode()
 notebook_mode = 'notebook'
 notebook_cmd = 'режим блокнота'
 default_mode = 'default'
@@ -31,7 +25,7 @@ wakeup_cmd = 'первая проснись'
 
 def get_displaysize() -> tuple[int, int]:
     size = check_output(
-        f'''xrandr | grep 'Screen 0:' | awk -F ',' '{{print $2}}' | awk '{{print $2, $4}}' ''',
+        f'''xrandr|grep 'Screen 0:'|awk -F ',' '{{print $2}}'|awk '{{print $2, $4}}' ''',
         encoding='utf-8',
         shell=True)
     displaysize_x, displaysize_y = int(size.split()[0]), int(size.split()[1])
@@ -128,26 +122,6 @@ def get_meat(act: str, cmd: str, d: dict) -> str:  # Возвращает ост
     split_cmd = cmd.split(' ')
     isection_words = get_intersection_word(act, cmd, d)
     return ' '.join(split_cmd[split_cmd.index(isection_words[-1]) + 1:]) if isection_words else None
-
-
-def get_ip() -> Optional[str]:
-    try:
-        url = "https://pr-cy.ru/browser-details/"
-        r = requests.get(url)
-        if r.status_code != 200:
-            return
-        soup = BeautifulSoup(r.text, "html.parser")
-        ip_addr = soup.find('div', class_="ip-myip").text
-        info = soup.find_all('div', class_="group-box__desc")
-        my_info = []
-        [my_info.append(re.sub(r'[^A-zА-яё0123456789.,:;!?-]', ' ', str(title.text.strip()))) for title in info]
-
-        print(f'     IP: {ip_addr}')
-        print(f'Country: {my_info[1]}')
-        print(f'    ISP: {my_info[0]}')
-        return ip_addr
-    except requests.exceptions.ConnectionError:
-        pass
 
 
 def check_internet() -> bool:  # internet check feature
