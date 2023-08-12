@@ -171,7 +171,7 @@ def check_run_scr() -> None:
 def thread_monitoring() -> None:
     sysmonitor = SysInformer()
     while True:
-        if not thread.is_alive():  # Слежка за за главным потоком.
+        if not thread.is_alive():  # Слежка за главным потоком.
             return AppWidget.close_widget()
         check_run_scr()  # Слежка за выполнением скриптов в системе.
         sysmonitor.sys_monitoring()  # Слежка за системой.
@@ -189,7 +189,7 @@ def main() -> None:
     widget = AppWidget.root
 
     # noinspection PyTypeChecker
-    with redirect_stdout(TextWrapper(text, label, info_label)):  # Перенаправляем весь STDOUT в tkinter.
+    with redirect_stdout(TextWrapper(text, label, info_label)):  # Перенаправляем весь STDOUT в окно tkinter.
         thread.start()  # Запускаем главный поток.
         is_alive_thread.start()  # Запускаем поток слежки за главным потоком.
         widget.protocol('WM_DELETE_WINDOW', widget.destroy)

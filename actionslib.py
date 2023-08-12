@@ -35,25 +35,21 @@ def yesno_action(yesno: str) -> None:
 def confirm_action(foo_name: str, isection: int) -> None:
     global last_cmdline, last_function
     if max_intersection_val >= isection:
-        talk(f'Вы уверены?')
         last_function = foo_name
         last_cmdline = cmdline
-        return
+        talk(f'Вы уверены?')
 
 
-def reboot_down(action: str) -> None:
-    command = f'echo "No command!"'
-
-    if last_function == action:
-        if action == 'sys_down':
-            command = f'systemctl poweroff'
-        elif action == 'sys_reboot':
-            command = f'systemctl reboot'
-
+def call_reboot_down(action: str) -> None:
+    def execute_command(cmd):
         tls.answer_ok_and_pass()
-        run(command, shell=True)
+        run(cmd, shell=True)
         sys.exit()
 
+    if last_function == action == 'sys_down':
+        return execute_command('systemctl poweroff')
+    elif last_function == action == 'sys_reboot':
+        return execute_command('systemctl reboot')
     confirm_action(action, 2)
 
 
@@ -121,11 +117,11 @@ def app_reboot() -> None:
 
 
 def sys_down() -> None:
-    reboot_down('sys_down')
+    call_reboot_down('sys_down')
 
 
 def sys_reboot() -> None:
-    reboot_down('sys_reboot')
+    call_reboot_down('sys_reboot')
 
 
 def conf_settings() -> None:

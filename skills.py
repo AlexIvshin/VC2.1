@@ -859,7 +859,7 @@ class ScriptStarter:
         tls.answer_ok_and_pass()
         if 'sudo' in scr:
             tls.answer_ok_and_pass(answer=False, enter_pass=True)
-        print(f'  Script: run {scr_name}.sh')
+        print(f'  Script: Run {scr_name}.sh')
         run(scr, shell=True)
 
 
