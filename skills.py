@@ -1,29 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
-import configparser
-import cpuinfo
-from datetime import date, datetime as dt
-import datetime
-import GPUtil
-from googletrans import Translator
 import os
-import pathlib
-from platform import uname
-import psutil
-import randfacts
 import random
 import re
 import requests
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 from subprocess import run, check_output, call
-from tabulate import tabulate as tb
 import time
+
 from typing import Union, Optional, Any
-import webbrowser
-import wikipedia
 
 from assistant import Assistant
 import dialog as dg
@@ -129,18 +114,20 @@ class Calculator:
 
 
 class SearchEngine:
+    import wikipedia
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
 
     def __init__(self, cmd, action, intersection):
-        search_words = get_input() if tls.check_hand_input(cmd) else tls.get_meat(action, cmd, dg.actions_dict)
-        if intersection < 2 or not search_words or not tls.check_internet():
-            return
-        self.search_words = search_words
+        self.intersection = intersection
         self.commandline = cmd
         self.action = action
-        talk(random.choice(dg.answer_ok))
+        self.search_words = get_input() if tls.check_hand_input(cmd) else tls.get_meat(action, cmd, dg.actions_dict)
 
     def get_result(self) -> None:
+        if self.intersection < 2 or not self.search_words or not tls.check_internet():
+            return
+
+        talk(random.choice(dg.answer_ok))
         print(f' Ищу: "{self.search_words}"')
 
         if 'гугл' in self.commandline:
@@ -159,6 +146,11 @@ class SearchEngine:
 
     @classmethod
     def google_search(cls, text: str) -> None:
+        import webbrowser
+        from selenium import webdriver
+        from selenium.webdriver.common.keys import Keys
+        from selenium.webdriver.chrome.options import Options
+
         driver = None
         url = 'http://www.google.com'
 
@@ -194,8 +186,8 @@ class SearchEngine:
     @classmethod
     def wiki_search(cls, text: str) -> None:
         try:
-            result = wikipedia.search(text)
-            page = wikipedia.page(result[0])
+            result = cls.wikipedia.search(text)
+            page = cls.wikipedia.page(result[0])
             title = page.title
             content = page.content
             run(f'{tls.choice_xterm("XtermSearch")} echo "{title}{content}" &', shell=True)
@@ -203,13 +195,13 @@ class SearchEngine:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError):
             cls.exception_words()
-        except (wikipedia.exceptions.DisambiguationError, wikipedia.exceptions.PageError):
+        except (cls.wikipedia.exceptions.DisambiguationError, cls.wikipedia.exceptions.PageError):
             cls.exception_words(wiki_error=True)
 
     @classmethod
     def wiki_short_answer(cls, text: str) -> None:
         try:
-            result = wikipedia.summary(text, sentences=3)
+            result = cls.wikipedia.summary(text, sentences=3)
             result = re.sub(r'[^A-zА-я́0123456789%)(.,`\'":;!?-—]', ' ', str(result)) \
                 .replace('.', '. ') \
                 .replace('  ', ' ') \
@@ -225,7 +217,7 @@ class SearchEngine:
 
         except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError,):
             cls.exception_words()
-        except (wikipedia.exceptions.DisambiguationError, wikipedia.exceptions.PageError):
+        except (cls.wikipedia.exceptions.DisambiguationError, cls.wikipedia.exceptions.PageError):
             cls.exception_words(wiki_error=True)
 
 
@@ -312,6 +304,8 @@ class Sinoptik:
 
     @classmethod
     def get_week_day(cls, number: int) -> int:
+        import datetime
+        from datetime import date
         return date.isoweekday(datetime.date.today() + datetime.timedelta(days=number))
 
     def get_url(self) -> str:
@@ -325,9 +319,11 @@ class Sinoptik:
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self) -> None:
-
         if self.intersection < 2 or not tls.check_internet():
             return
+
+        from datetime import date, datetime as dt
+        from tabulate import tabulate as tb
 
         url_weather_city = self.get_url()
         if not url_weather_city:
@@ -392,8 +388,7 @@ class Sinoptik:
 
 class Polyhistor:
     def __init__(self, commandline, intersection):
-        if intersection < 2:
-            return
+        self.intersection = intersection
         self.commandline = commandline
 
     @staticmethod
@@ -419,6 +414,10 @@ class Polyhistor:
     def get_fact() -> Optional[Any]:
         if not tls.check_internet():
             return
+
+        import randfacts
+        from googletrans import Translator
+
         f = randfacts.get_fact(False)
         tr = Translator()
         fact = tr.translate(f, dest='ru')
@@ -433,6 +432,8 @@ class Polyhistor:
         return random.choice(sayings)
 
     def get_result(self) -> None:
+        if self.intersection < 2:
+            return
         try:
             result = None
             if 'анекдот' in self.commandline:
@@ -453,8 +454,7 @@ class Polyhistor:
 class ExchangeRates:
 
     def __init__(self, commandline, intersection):
-        if intersection < 2 or not tls.check_internet():
-            return
+        self.intersection = intersection
         self.commandline = commandline
 
     @staticmethod
@@ -478,6 +478,11 @@ class ExchangeRates:
         return key, currency
 
     def get_exchange_rates(self) -> None:
+        if self.intersection < 2 or not tls.check_internet():
+            return
+
+        from datetime import datetime as dt
+
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
         currency_key, currency = self.determine_the_currency()
         url = f'https://minfin.com.ua/currency/banks/{currency_key}/'
@@ -531,20 +536,13 @@ class ExchangeRates:
 
 class Translators:
     def __init__(self, commandline, reverse=False):
-        if not tls.check_internet():
-            return
         self.commandline = commandline
         self.reverse = reverse
 
     def check_language(self) -> tuple[str, str]:
         from_lang, to_lang = 'ru', 'en'
-        languages: dict = {'украинск': 'ukr',
-                           'русск': 'ru',
-                           'английск': 'en',
-                           'немецк': 'de',
-                           'итальянск': 'it',
-                           'французск': 'fr',
-                           'испанск': 'es'}
+        languages: dict = {'украинск': 'ukr', 'русск': 'ru', 'английск': 'en', 'немецк': 'de',
+                           'итальянск': 'it', 'французск': 'fr', 'испанск': 'es'}
 
         for lang in languages.keys():
             if f'с {lang}' in self.commandline:
@@ -581,6 +579,9 @@ class Translators:
             return ':('
 
     def get_result(self) -> None:
+        if not tls.check_internet():
+            return
+
         from_lang, to_lang = self.check_language()
 
         if self.reverse:
@@ -610,6 +611,7 @@ class Translators:
 
 
 class SysInformer:
+
     @classmethod
     def correct_size(cls, bts, ending='iB') -> str:
         _size = 1024
@@ -619,6 +621,10 @@ class SysInformer:
             bts /= _size
 
     def create_sysinfo(self) -> dict[str, dict]:
+        import cpuinfo
+        import psutil
+        from platform import uname
+
         collect_info_dict: dict = {}
 
         if 'info' not in collect_info_dict:
@@ -717,6 +723,8 @@ class SysInformer:
 
     @staticmethod
     def sys_monitoring() -> None:
+        import GPUtil
+        import psutil
         core_temp_warning = 90.0
         core_temp_critical = 95.0
         gpu_temp_warning = 93.0
@@ -765,9 +773,6 @@ class SysInformer:
 
 
 class AssistantSettings:
-    config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
-    config = configparser.ConfigParser()
-    config.read(config_path)
 
     def __init__(self, commandline):
         self.commandline = commandline
@@ -793,8 +798,12 @@ class AssistantSettings:
         tls.restart_app()
 
     def change_conf_set(self) -> None:
+        import configparser
+        import pathlib
+
+        config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
         config = configparser.ConfigParser()
-        config.read("settings.ini")
+        config.read(config_path)
         param = w2n(self.commandline)
 
         if not isinstance(param, int):
@@ -899,8 +908,7 @@ class Anonimizer:
         return True
 
     def __init__(self, intersection, on_off):
-        if intersection < 2 or not tls.check_internet() or not self.component_check():
-            return
+        self.intersection = intersection
         self.on_off = on_off
 
     @staticmethod
@@ -913,6 +921,9 @@ class Anonimizer:
             talk('Похоже проблемы с интернетом!')
 
     def start_stop_anonimizer(self) -> None:
+        if self.intersection < 2 or not tls.check_internet() or not self.component_check():
+            return
+
         if self.on_off == 'on':
             ipaddress = self.get_ip()
             print(f'  Мой IP: {ipaddress}')
@@ -985,6 +996,7 @@ class FileLife:
         if not memo_data:
             return False
 
+        import datetime
         short_name = ' '.join(memo_data.split()[0:3])
         current_time = datetime.datetime.now().strftime('%d%m%y')
         file_name = f'''{short_name}_{current_time}.txt'''.replace(' ', '_')

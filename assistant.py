@@ -129,35 +129,35 @@ class Assistant:
         import utils as tls
         import actionslib as alib
         from dialog import on_off_dict, yes_no_dict, actions_dict
-        from skills import Translators, ProgramManager
-        from notebook import notebook_reacts
 
-        cmdline = command
-        self.mode = tls.choice_mode(cmdline, var_mode=self.mode)  # Переопределение режима
+        def check_mode() -> str:
+            self.mode = tls.choice_mode(command, var_mode=self.mode)  # Переопределение режима
+            if 'translator' in self.mode:
+                from skills import Translators
+                if self.mode == tls.translator_mode:
+                    Translators(command).get_result()
+                if self.mode == tls.reverse_mode:
+                    Translators(command, reverse=True).get_result()
 
-        try:
             if self.mode == tls.notebook_mode:
-                notebook_reacts(cmdline)
-            elif self.mode == tls.translator_mode:
-                Translators(cmdline).get_result()
-            elif self.mode == tls.reverse_mode:
-                Translators(cmdline, reverse=True).get_result()
-            elif self.mode == tls.sleep_mode:
-                return
+                from notebook import notebook_reacts
+                notebook_reacts(command)
 
-            on_off = tls.check_yesno_onoff(cmdline, dictionary=on_off_dict)  # Определение вкл/выкл
-            yes_no = tls.check_yesno_onoff(cmdline, dictionary=yes_no_dict)  # Определение да/нет
-            program = tls.check_prg(cmdline)  # Определение имени программы, если таковая есть в команде
+            return self.mode
 
-            if program and on_off:
-                ProgramManager(program, on_off).start_stop_program()
+        mode = check_mode()
+        if mode == 'sleep':
+            return
 
-            if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
-                alib.yesno_action(yes_no)
-            else:  # выбор реакций модели на команды
-                action, max_intersection = tls.choice_action(cmdline, actions_dict)
-                if action:
-                    alib.callfunc(cmdline, action, max_intersection, onoff=on_off)
+        on_off = tls.check_yesno_onoff(command, dictionary=on_off_dict)  # Определение вкл/выкл
+        yes_no = tls.check_yesno_onoff(command, dictionary=yes_no_dict)  # Определение да/нет
+        program = tls.check_prg(command)  # Определение имени программы, если таковая есть в команде
+        action, max_intersection = tls.choice_action(command, actions_dict)
 
-        except (AttributeError, ValueError):
-            pass
+        if program and on_off:
+            from skills import Translators, ProgramManager
+            ProgramManager(program, on_off).start_stop_program()
+        if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
+            alib.yesno_action(yes_no)
+        if action and max_intersection:  # выбор реакций модели на команды
+            alib.callfunc(command, action, max_intersection, onoff=on_off)
