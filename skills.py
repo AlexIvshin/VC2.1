@@ -59,9 +59,16 @@ class Calculator:
         self.cmd = commandline
         self.n1, self.operator, self.n2 = self.get_calc_elem()
 
-    def get_calc_elem(self) -> tuple:
+    @classmethod
+    def check_type_num(cls, n) -> Union[float, int]:
+        try:
+            return float(n) if '.' in n else int(n)
+        except ValueError:
+            pass
+
+    def get_calc_elem(self) -> tuple[float | int, str | None, float | int] | tuple[None, None, None]:
         calc_string = w2n(self.cmd, otherwords=True).split()
-        interval = []
+        interval: list = []
         for i in calc_string:
             try:
                 interval.append(calc_string.index(i)) if float(i) else None
@@ -70,17 +77,10 @@ class Calculator:
         if len(interval) == 2:
             n1, n2 = self.check_type_num(calc_string[interval[0]]), self.check_type_num(calc_string[interval[1]])
             opr_str = ' '.join(calc_string[interval[0] + 1:interval[1]])
-            operator = dg.opers[opr_str] if opr_str in dg.opers.keys() else None
+            operator: str = dg.opers[opr_str] if opr_str in dg.opers.keys() else None
             if operator:
                 return n1, operator, n2
         return None, None, None
-
-    @classmethod
-    def check_type_num(cls, n) -> Union[float, int]:
-        try:
-            return float(n) if '.' in n else int(n)
-        except ValueError:
-            pass
 
     def get_result(self) -> Union[None, float, int]:
         n1, operator, n2 = self.n1, self.operator, self.n2
