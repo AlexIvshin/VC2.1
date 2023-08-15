@@ -55,12 +55,25 @@ class ProgramManager:
 
 class Calculator:
 
-    def __init__(self, commandline, action):
-        calc_string = w2n(tls.get_meat(action, commandline, dg.actions_dict), otherwords=True).split()
-        opr = ' '.join(calc_string[1:-1])
-        self.operator = dg.opers[opr] if opr in dg.opers.keys() else None
-        self.n1 = self.check_type_num(calc_string[0])
-        self.n2 = self.check_type_num(calc_string[-1])
+    def __init__(self, commandline):
+        self.cmd = commandline
+        self.n1, self.operator, self.n2 = self.get_calc_elem()
+
+    def get_calc_elem(self) -> tuple:
+        calc_string = w2n(self.cmd, otherwords=True).split()
+        interval = []
+        for i in calc_string:
+            try:
+                interval.append(calc_string.index(i)) if float(i) else None
+            except ValueError:
+                pass
+        if len(interval) == 2:
+            n1, n2 = self.check_type_num(calc_string[interval[0]]), self.check_type_num(calc_string[interval[1]])
+            opr_str = ' '.join(calc_string[interval[0] + 1:interval[1]])
+            operator = dg.opers[opr_str] if opr_str in dg.opers.keys() else None
+            if operator:
+                return n1, operator, n2
+        return None, None, None
 
     @classmethod
     def check_type_num(cls, n) -> Union[float, int]:

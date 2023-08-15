@@ -100,7 +100,7 @@ def search() -> None:
 
 
 def calculate() -> None:
-    skills.Calculator(cmdline, function).tell_the_result()
+    skills.Calculator(cmdline).tell_the_result()
 
 
 def weather() -> None:
