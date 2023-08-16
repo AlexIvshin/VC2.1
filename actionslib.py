@@ -7,7 +7,7 @@ from subprocess import run
 
 import dialog as dg
 import skills
-import utils as tls
+import support_skills as ss
 from assistant import Assistant
 
 talk = Assistant().speaks
@@ -42,7 +42,7 @@ def confirm_action(foo_name: str, isection: int) -> None:
 
 def call_reboot_down(action: str) -> None:
     def execute_command(cmd):
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
         run(cmd, shell=True)
         sys.exit()
 
@@ -80,9 +80,9 @@ def thanks_output() -> None:
 
 def i_am_output() -> None:
     if max_intersection_val > 1 and len(command_word) < 4:
-        intersection_word = tls.get_intersection_word(function, cmdline, dg.actions_dict)
+        intersection_word = ss.get_intersection_word(function, cmdline, dg.actions_dict)
 
-        if tls.check_word_sequence(cmdline, intersection_word):
+        if ss.check_word_sequence(cmdline, intersection_word):
             talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
 
 
@@ -113,7 +113,7 @@ def stop_app() -> None:
 
 
 def app_reboot() -> None:
-    tls.restart_app()
+    ss.restart_app()
 
 
 def sys_down() -> None:
@@ -142,9 +142,9 @@ def random_joke() -> None:
 def show_sys_info() -> None:
     if max_intersection_val < 3:
         return
-    tls.answer_ok_and_pass()
+    ss.answer_ok_and_pass()
     puth = f'{homedir}/skills.py'
-    run(f'{tls.choice_xterm("XtermInfo")} python3 {puth} &', shell=True)
+    run(f'{ss.choice_xterm("XtermInfo")} python3 {puth} &', shell=True)
 
 
 def exchange_rates() -> None:

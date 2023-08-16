@@ -6,7 +6,7 @@ from assistant import Assistant, stack
 from skills import FileLife
 from typing import Union
 from wordstonum import word2num_ru as w2n
-import utils as tls
+import support_skills as ss
 
 file_action = FileLife()
 talk = Assistant().speaks
@@ -37,9 +37,9 @@ def notebook_reacts(commandline: str) -> None:
     global action, file, cmdline
 
     cmdline = commandline
-    yes_no = tls.check_yesno_onoff(cmdline, dictionary=yes_no_dict)
+    yes_no = ss.check_yesno_onoff(cmdline, dictionary=yes_no_dict)
     num_file = w2n(cmdline)
-    action, intersection = tls.choice_action(cmdline, notebook_action_dict)
+    action, intersection = ss.choice_action(cmdline, notebook_action_dict)
     mem_stack: list = stack.get_stack()
 
     if yes_no == 'cancel':

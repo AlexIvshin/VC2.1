@@ -13,7 +13,7 @@ from typing import Union, Optional, Any
 from assistant import Assistant
 import dialog as dg
 from wordstonum import word2num_ru as w2n
-import utils as tls
+import support_skills as ss
 from widgets.hand_input_widget import get_input
 
 talk = Assistant().speaks
@@ -38,7 +38,7 @@ class ProgramManager:
 
     def start_stop_program(self):
         prg = self.get_program_name()
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
 
         if self.action == 'on':
             print(f'  {prg.capitalize()} starts!')
@@ -115,7 +115,7 @@ class Calculator:
             sep = 'целая' if str(integer_string)[-1] == '1' else 'целых'
             return f'{integer_string} {sep} {decimal_string} {decimal_title}'
 
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
         print()
         print(f'  {self.n1} {self.operator} {self.n2} = {round(result, 4)}')
         print()
@@ -134,10 +134,10 @@ class SearchEngine:
         self.intersection = intersection
         self.commandline = cmd
         self.action = action
-        self.search_words = get_input() if tls.check_hand_input(cmd) else tls.get_meat(action, cmd, dg.actions_dict)
+        self.search_words = get_input() if ss.check_hand_input(cmd) else ss.get_meat(action, cmd, dg.actions_dict)
 
     def get_result(self) -> None:
-        if self.intersection < 2 or not self.search_words or not tls.check_internet():
+        if self.intersection < 2 or not self.search_words or not ss.check_internet():
             return
 
         talk(random.choice(dg.answer_ok))
@@ -203,7 +203,7 @@ class SearchEngine:
             page = cls.wikipedia.page(result[0])
             title = page.title
             content = page.content
-            run(f'{tls.choice_xterm("XtermSearch")} echo "{title}{content}" &', shell=True)
+            run(f'{ss.choice_xterm("XtermSearch")} echo "{title}{content}" &', shell=True)
             talk('Это всё, что удалось найти!')
 
         except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError):
@@ -332,7 +332,7 @@ class Sinoptik:
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self) -> None:
-        if self.intersection < 2 or not tls.check_internet():
+        if self.intersection < 2 or not ss.check_internet():
             return
 
         from datetime import date, datetime as dt
@@ -406,7 +406,7 @@ class Polyhistor:
 
     @staticmethod
     def get_joke() -> Optional[Any]:
-        if not tls.check_internet():
+        if not ss.check_internet():
             return
         url_joke = 'https://www.anekdot.ru/random/anekdot/'
         r = requests.get(url_joke)
@@ -425,7 +425,7 @@ class Polyhistor:
 
     @staticmethod
     def get_fact() -> Optional[Any]:
-        if not tls.check_internet():
+        if not ss.check_internet():
             return
 
         import randfacts
@@ -491,7 +491,7 @@ class ExchangeRates:
         return key, currency
 
     def get_exchange_rates(self) -> None:
-        if self.intersection < 2 or not tls.check_internet():
+        if self.intersection < 2 or not ss.check_internet():
             return
 
         from datetime import datetime as dt
@@ -592,7 +592,7 @@ class Translators:
             return ':('
 
     def get_result(self) -> None:
-        if not tls.check_internet():
+        if not ss.check_internet():
             return
 
         from_lang, to_lang = self.check_language()
@@ -602,7 +602,7 @@ class Translators:
         from_to = f'  {from_lang.upper()} -> {to_lang.upper()}'
         print(from_to)
 
-        text = get_input() if tls.check_hand_input(self.commandline) else None
+        text = get_input() if ss.check_hand_input(self.commandline) else None
 
         if 'текст' in self.commandline and not text:
             split_commandline = self.commandline.split()
@@ -612,7 +612,7 @@ class Translators:
         if not text:
             return
 
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
         translator_res = self.get_tranlate(text, from_lang, to_lang)
         googletrans_res = self.get_google_translate(text, to_lang)
         os.system('clear')
@@ -808,7 +808,7 @@ class AssistantSettings:
         else:
             talk('Мои настройки будут изменены!')
 
-        tls.restart_app()
+        ss.restart_app()
 
     def change_conf_set(self) -> None:
         import configparser
@@ -869,20 +869,19 @@ class ScriptStarter:
 
         if script_name == 'nmstart' and self.intersection == 3 \
                 or script_name == 'cleancashe' and self.intersection == 2:
-            script = f'{tls.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh &'
+            script = f'{ss.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh &'
         elif script_name == 'sysfullupgrade' and self.intersection == 2:
-            script = f'{tls.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh &'
+            script = f'{ss.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh &'
         return script, script_name
 
     def run_script(self) -> None:
         scr, scr_name = self.get_script()
         if not scr:
             return
-        tls.answer_ok_and_pass()
-        if 'sudo' in scr:
-            tls.answer_ok_and_pass(answer=False, enter_pass=True)
-        print(f'  Script: Run {scr_name}.sh')
         run(scr, shell=True)
+        print(f'  Script: Run {scr_name}.sh')
+        passwd = True if 'sudo' in scr else False
+        ss.answer_ok_and_pass(enter_pass=passwd)
 
 
 class Anonimizer:
@@ -934,23 +933,23 @@ class Anonimizer:
             talk('Похоже проблемы с интернетом!')
 
     def start_stop_anonimizer(self) -> None:
-        if self.intersection < 2 or not tls.check_internet() or not self.component_check():
+        if self.intersection < 2 or not ss.check_internet() or not self.component_check():
             return
 
         if self.on_off == 'on':
             ipaddress = self.get_ip()
             print(f'  Мой IP: {ipaddress}')
-            tls.answer_ok_and_pass(enter_pass=True)
+            ss.answer_ok_and_pass(enter_pass=True)
             mic_sins(0)
-            run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -l', shell=True)
+            run(f'{ss.choice_xterm("XtermSmall")} sudo toriptables2.py -l', shell=True)
             new_ipaddress = self.get_ip()
             print(f'  Мой новый IP: {new_ipaddress}')
             return talk('Упс! Не вышло') if ipaddress == new_ipaddress else talk(random.choice(dg.done))
 
         if self.on_off == 'off':
-            tls.answer_ok_and_pass(enter_pass=True)
+            ss.answer_ok_and_pass(enter_pass=True)
             mic_sins(0)
-            run(f'{tls.choice_xterm("XtermSmall")} sudo toriptables2.py -f', shell=True)
+            run(f'{ss.choice_xterm("XtermSmall")} sudo toriptables2.py -f', shell=True)
             print(f'  Мой IP: {self.get_ip()}')
             return talk(random.choice(dg.done))
 
@@ -1000,12 +999,12 @@ class FileLife:
         new_file_name = self.file_name_assignment(self.note_dir, get_input(old_name))
         old_file = os.path.join(self.note_dir, old_name)
         new_file = os.path.join(self.note_dir, new_file_name)
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
         os.rename(old_file, new_file)
 
     def create_memo_file(self, cmd: str) -> bool:
-        memo_data = get_input() if tls.check_hand_input(cmd) \
-            else tls.get_meat('create_memo_file', cmd, dg.notebook_action_dict)
+        memo_data = get_input() if ss.check_hand_input(cmd) \
+            else ss.get_meat('create_memo_file', cmd, dg.notebook_action_dict)
         if not memo_data:
             return False
 
@@ -1019,7 +1018,7 @@ class FileLife:
             talk('Мемо-файл создан!')
 
     def edit_file(self, file: str) -> None:
-        tls.answer_ok_and_pass()
+        ss.answer_ok_and_pass()
         run(f'kate {self.note_dir}/{file} &', shell=True)
 
     def delete_file(self, file: str, permission=False) -> str:

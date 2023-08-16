@@ -94,7 +94,7 @@ class Assistant:
                     result = rec.Result()
                     text = js.loads(result)['text']
 
-                    if len(text) > 0:
+                    if text:
                         print('◄ ' + text.capitalize())
                         start = time.time()
                         self.reacts(text)
@@ -126,20 +126,20 @@ class Assistant:
         return voice(words)
 
     def reacts(self, command: str) -> None:
-        import utils as tls
+        import support_skills as ss
         import actionslib as alib
         from dialog import on_off_dict, yes_no_dict, actions_dict
 
         def check_mode() -> str:
-            self.mode = tls.choice_mode(command, var_mode=self.mode)  # Переопределение режима
+            self.mode = ss.choice_mode(command, var_mode=self.mode)  # Переопределение режима
             if 'translator' in self.mode:
                 from skills import Translators
-                if self.mode == tls.translator_mode:
+                if self.mode == ss.translator_mode:
                     Translators(command).get_result()
-                if self.mode == tls.reverse_mode:
+                if self.mode == ss.reverse_mode:
                     Translators(command, reverse=True).get_result()
 
-            if self.mode == tls.notebook_mode:
+            if self.mode == ss.notebook_mode:
                 from notebook import notebook_reacts
                 notebook_reacts(command)
 
@@ -149,10 +149,10 @@ class Assistant:
         if mode == 'sleep':
             return
 
-        on_off = tls.check_yesno_onoff(command, dictionary=on_off_dict)  # Определение вкл/выкл
-        yes_no = tls.check_yesno_onoff(command, dictionary=yes_no_dict)  # Определение да/нет
-        program = tls.check_prg(command)  # Определение имени программы, если таковая есть в команде
-        action, max_intersection = tls.choice_action(command, actions_dict)
+        on_off = ss.check_yesno_onoff(command, dictionary=on_off_dict)  # Определение вкл/выкл
+        yes_no = ss.check_yesno_onoff(command, dictionary=yes_no_dict)  # Определение да/нет
+        program = ss.check_prg(command)  # Определение имени программы, если таковая есть в команде
+        action, max_intersection = ss.choice_action(command, actions_dict)
 
         if program and on_off:
             from skills import Translators, ProgramManager

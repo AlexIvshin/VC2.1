@@ -160,11 +160,8 @@ russian_number_system = {
     'целая': '.'
 }
 
-# decimal_words = ['ноль', 'один', 'одна', 'два', 'две', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять']
-
 '''
 function to form numeric multipliers for million, billion, thousand etc.
-
 input: list of strings
 return value: integer
 '''
@@ -192,14 +189,6 @@ output: double
 
 
 def get_decimal_sum(decimal_digit_words):
-    # decimal_number_str = []
-    # for dec_word in decimal_digit_words:
-    #     if dec_word not in decimal_words:
-    #         return 0
-    #     else:
-    #         decimal_number_str.append(russian_number_system[dec_word])
-
-    # final_decimal_string = '0.' + ''.join(map(str, decimal_number_str))
     decimal_number_str = word_to_num(' '.join(decimal_digit_words))
     final_decimal_string = '0.' + str(decimal_number_str)
     return float(final_decimal_string)
