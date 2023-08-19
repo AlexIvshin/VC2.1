@@ -140,7 +140,7 @@ class SearchEngine:
             return
 
         talk(random.choice(dg.answer_ok))
-        print(f' Ищу: "{self.search_words}"')
+        print(f'  Ищу: "{self.search_words}"')
 
         if 'гугл' in self.commandline:
             return self.google_search(self.search_words)
