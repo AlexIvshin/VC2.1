@@ -77,14 +77,12 @@ class TextWrapper:
 
 
 def check_run_scr() -> None:
-    """
-    This function monitors the execution of scripts in the system.
-    (only reacts to files with "sh" extension)
-    Эта функция мониторит выполнение скриптов в системе.
-    (реагирует только на файлы с расширением "sh")
-    """
     global run_script, num_scripts_to_run
     run_scripts = []
+    """
+    This function monitors the execution of scripts in the system. (only reacts to files with "sh" extension)
+    Эта функция мониторит выполнение скриптов в системе. (реагирует только на файлы с расширением "sh")
+    """
 
     def report_completion() -> None:
         talk = Assistant().speaks
@@ -110,12 +108,18 @@ def check_run_scr() -> None:
 
 def thread_monitoring() -> None:
     sysmonitor = SysInformer()
+    """
+    This function in a loop with an interval of 2 seconds monitors the main thread "tread",
+    and if it is interrupted, closes the main widget, and monitors the system and the execution of bash scripts.
+    Эта функция в цикле с интервалом 2 сек следит за главным потоком tread, и если он прерван,
+    закрывает главный виджет, а также мониторится система и исполнение bash-скриптов.
+    """
 
     while True:
-        if not thread.is_alive():  # Слежка за главным потоком.
+        if not thread.is_alive():
             return AppWidget.close_widget()
-        check_run_scr()  # Слежка за выполнением скриптов в системе.
-        sysmonitor.sys_monitoring()  # Слежка за системой.
+        check_run_scr()
+        sysmonitor.sys_monitoring()
         time.sleep(2)
 
 
