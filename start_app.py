@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
 from subprocess import run
 import tkinter as tk
 from contextlib import redirect_stdout
@@ -10,10 +9,9 @@ import time
 import subprocess as sub
 
 from assistant import Assistant
+from dialog import title_app
 from skills import SysInformer
-
-import configparser
-import pathlib
+from widgets.app_widget import AppWidget
 
 run_script: bool = False
 num_scripts_to_run = 0
@@ -38,7 +36,7 @@ class TextWrapper:
             self.text_field.delete(1.0, 'end')
 
         if 'Mode:' in text:
-            self.label_field.configure(text='VCom 2.1 • ' + text)
+            self.label_field.configure(text=f'{title_app} • {text}')
 
         elif '-infolabele-' in text:
             sys_info_string = ''
@@ -76,67 +74,6 @@ class TextWrapper:
         self.text_field.update()
         self.label_field.update()
         self.info_label_field.update()
-
-
-class AppWidget:
-    config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
-    config = configparser.ConfigParser()
-    config.read(config_path)
-
-    root = tk.Tk()
-    displaysize_x = root.winfo_screenwidth()
-    w = int(config['WidgetSize']['width'])
-    h = int(config['WidgetSize']['height'])
-    x = int((displaysize_x - w) / 2)
-    root.geometry(f"{w}x{h}+{x}+20")
-    root.title('VCom 2.1')
-    root.resizable(False, False)
-    root.wait_visibility(root)
-    root.wm_attributes("-alpha", 0.8)
-    # root.configure(border=2)
-
-    label = tk.Label(
-        root,
-        text='VCom 2.1',
-        background='#090c10',
-        foreground='#53ff1a',
-        font='Hack 7',
-        anchor='center',
-        padx=7)
-    label.pack(fill='x')
-
-    text = tk.Text(
-        root,
-        height=17,
-        border=0,
-        background='#000000',
-        selectbackground='#303d30',
-        highlightthickness=0,
-        insertwidth=0,
-        font='Hack 9',
-        wrap='word',
-        padx=7)
-    text.mark_set('insert', 'end')
-    text.pack(fill='x')
-
-    info_label = tk.Label(
-        root,
-        compound="bottom",
-        background='#000000',
-        foreground='#00cc00',
-        font='Hack 7',
-        anchor='w',
-        padx=7)
-    info_label.pack(expand=True, fill='x')
-
-    @classmethod
-    def close_widget(cls) -> None:
-        cls.root.quit()
-        try:
-            cls.root.destroy()
-        except RuntimeError:
-            pass
-        sys.exit()
 
 
 def check_run_scr() -> None:
