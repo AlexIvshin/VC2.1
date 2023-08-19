@@ -130,14 +130,13 @@ class SearchEngine:
     import wikipedia
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
 
-    def __init__(self, cmd, action, intersection):
-        self.intersection = intersection
+    def __init__(self, cmd, action):
         self.commandline = cmd
         self.action = action
         self.search_words = get_input() if ss.check_hand_input(cmd) else ss.get_meat(action, cmd, dg.actions_dict)
 
     def get_result(self) -> None:
-        if self.intersection < 2 or not self.search_words or not ss.check_internet():
+        if not self.search_words or not ss.check_internet():
             return
 
         talk(random.choice(dg.answer_ok))
@@ -310,9 +309,8 @@ class Sinoptik:
     weekdays = ['0', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
     site_url = 'https://sinoptik.ua'
 
-    def __init__(self, commandline, intersection):
+    def __init__(self, commandline):
         self.commandline = commandline
-        self.intersection = intersection
         self.split_commandline = commandline.split()
 
     @classmethod
@@ -332,7 +330,7 @@ class Sinoptik:
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self) -> None:
-        if self.intersection < 2 or not ss.check_internet():
+        if not ss.check_internet():
             return
 
         from datetime import date, datetime as dt
@@ -400,8 +398,7 @@ class Sinoptik:
 
 
 class Polyhistor:
-    def __init__(self, commandline, intersection):
-        self.intersection = intersection
+    def __init__(self, commandline):
         self.commandline = commandline
 
     @staticmethod
@@ -445,8 +442,6 @@ class Polyhistor:
         return random.choice(sayings)
 
     def get_result(self) -> None:
-        if self.intersection < 2:
-            return
         try:
             result = None
             if 'анекдот' in self.commandline:
@@ -466,8 +461,7 @@ class Polyhistor:
 
 class ExchangeRates:
 
-    def __init__(self, commandline, intersection):
-        self.intersection = intersection
+    def __init__(self, commandline):
         self.commandline = commandline
 
     @staticmethod
@@ -491,9 +485,8 @@ class ExchangeRates:
         return key, currency
 
     def get_exchange_rates(self) -> None:
-        if self.intersection < 2 or not ss.check_internet():
+        if not ss.check_internet():
             return
-
         from datetime import datetime as dt
 
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
@@ -738,12 +731,12 @@ class SysInformer:
     def sys_monitoring() -> None:
         import GPUtil
         import psutil
-        core_temp_warning = 90.0
-        core_temp_critical = 95.0
-        gpu_temp_warning = 93.0
-        gpu_temp_critical = 98.0
-        ram_per_warning = 90.0
-        ram_per_critical = 98.0
+        core_temp_warning = 90
+        core_temp_critical = 95
+        gpu_temp_warning = 93
+        gpu_temp_critical = 98
+        ram_per_warning = 90
+        ram_per_critical = 98
         gpus = GPUtil.getGPUs()
         cores_temps = []
         gpus_temps = []
@@ -751,34 +744,36 @@ class SysInformer:
         [cores_temps.append(temp.current) for temp in psutil.sensors_temperatures()['coretemp']]
         [gpus_temps.append(gpu.temperature) for gpu in gpus]
 
-        ram_per_used: float = psutil.virtual_memory().percent
-        swap_per_used: float = psutil.swap_memory().percent
-        core_temp: float = max(cores_temps)
-        gpu_temp: float = max(gpus_temps)
+        ram_per_used: float = int(round(psutil.virtual_memory().percent, 0))
+        swap_per_used: float = int(round(psutil.swap_memory().percent, 0))
+        core_temp: float = int(round(max(cores_temps), 0))
+        gpu_temp: float = int(round(max(gpus_temps), 0))
 
         # Следим за оперативной памятью
         if ram_per_warning <= ram_per_used < ram_per_critical:
-            talk(f'ВНИМАНИЕ! Оперативная память заполнена на {int(round(ram_per_used, 0))}%!')
+            talk(f'ВНИМАНИЕ! Оперативная память заполнена на {ram_per_used}%!')
         if ram_per_used >= ram_per_critical:
-            talk(f'ВНИМАНИЕ! Критично! Оперативная память заполнена на {int(round(ram_per_used, 0))}%!')
+            talk(f'ВНИМАНИЕ! Критично! Оперативная память заполнена на {ram_per_used}%!')
         # Следим за swap-диском
-        if ram_per_warning <= swap_per_used < ram_per_critical:
-            talk(f'ВНИМАНИЕ! Swap заполнен на {int(round(swap_per_used, 0))}%!')
-        if swap_per_used >= ram_per_critical:
-            talk(f'ВНИМАНИЕ! Критично! Swap заполнен на {int(round(swap_per_used, 0))}%!')
+        if swap_per_used:
+            if ram_per_warning <= swap_per_used < ram_per_critical:
+                talk(f'ВНИМАНИЕ! Swap заполнен на {swap_per_used}%!')
+            if swap_per_used >= ram_per_critical:
+                talk(f'ВНИМАНИЕ! Критично! Swap заполнен на {swap_per_used}%!')
         # Следим за температурой ядра
         if core_temp_warning <= core_temp < core_temp_critical:
-            talk(f'ВНИМАНИЕ! Температура ядра́ {int(round(core_temp, 0))}°!')
+            talk(f'ВНИМАНИЕ! Температура ядра́ {core_temp}°!')
         if core_temp >= core_temp_critical:
-            talk(f'ВНИМАНИЕ! Критично! Температура ядра́ {int(round(core_temp, 0))}°!')
+            talk(f'ВНИМАНИЕ! Критично! Температура ядра́ {core_temp}°!')
         # Следим за температурой графического ядра
         if gpu_temp_warning <= gpu_temp < gpu_temp_critical:
-            talk(f'ВНИМАНИЕ! Температура графического ядра́ {int(round(gpu_temp, 0))}°!')
+            talk(f'ВНИМАНИЕ! Температура графического ядра́ {gpu_temp}°!')
         if gpu_temp >= gpu_temp_critical:
-            talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {int(round(gpu_temp, 0))}°!')
+            talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {gpu_temp}°!')
 
+        swap_str = 'not used' if swap_per_used == 0 else f'{swap_per_used}%'
         print(f'-infolabele-■ Core temp: {core_temp}°  ■ GPU temp: {gpu_temp}°  ■ '
-              f'Mem used: {ram_per_used}%  ■ SWAP Used: {swap_per_used}%  ■ Runtime: no process', end='')
+              f'Mem used: {ram_per_used}%  ■ SWAP Used: {swap_str}  ■ Runtime: no process', end='')
 
     def get_sysinfo(self) -> None:
         sysinfo = self.create_sysinfo()
@@ -858,20 +853,18 @@ class AssistantSettings:
 
 
 class ScriptStarter:
-    scriptdir = f'{homedir}/scripts/'
+    DIR = f'{homedir}/scripts/'
 
-    def __init__(self, script_key, intersection):
+    def __init__(self, script_key):
         self.script_key = script_key
-        self.intersection = intersection
 
     def get_script(self) -> tuple[str, str]:
         script, script_name = None, ''.join(self.script_key.split('_')[-1])
 
-        if script_name == 'nmstart' and self.intersection == 3 \
-                or script_name == 'cleancashe' and self.intersection == 2:
-            script = f'{ss.choice_xterm("XtermSmall")} sudo {self.scriptdir}./{script_name}.sh &'
-        elif script_name == 'sysfullupgrade' and self.intersection == 2:
-            script = f'{ss.choice_xterm("Xterm")} sudo {self.scriptdir}./{script_name}.sh &'
+        if script_name == 'nmstart' or script_name == 'cleancashe':
+            script = f'{ss.choice_xterm("XtermSmall")} sudo {self.DIR}./{script_name}.sh &'
+        elif script_name == 'sysfullupgrade':
+            script = f'{ss.choice_xterm("Xterm")} sudo {self.DIR}./{script_name}.sh &'
         return script, script_name
 
     def run_script(self) -> None:
@@ -919,8 +912,7 @@ class Anonimizer:
 
         return True
 
-    def __init__(self, intersection, on_off):
-        self.intersection = intersection
+    def __init__(self, on_off):
         self.on_off = on_off
 
     @staticmethod
@@ -933,7 +925,7 @@ class Anonimizer:
             talk('Похоже проблемы с интернетом!')
 
     def start_stop_anonimizer(self) -> None:
-        if self.intersection < 2 or not ss.check_internet() or not self.component_check():
+        if not ss.check_internet() or not self.component_check():
             return
 
         if self.on_off == 'on':
@@ -954,7 +946,7 @@ class Anonimizer:
             return talk(random.choice(dg.done))
 
 
-class FileLife:
+class File:
     homedir = os.getcwdb().decode(encoding='utf-8')
     note_dir = os.path.abspath('notebook')
 

@@ -152,12 +152,12 @@ class Assistant:
         on_off = ss.check_yesno_onoff(command, dictionary=on_off_dict)  # Определение вкл/выкл
         yes_no = ss.check_yesno_onoff(command, dictionary=yes_no_dict)  # Определение да/нет
         program = ss.check_prg(command)  # Определение имени программы, если таковая есть в команде
-        action, max_intersection = ss.choice_action(command, actions_dict)
+        action = ss.choice_action(command, actions_dict)
 
         if program and on_off:
             from skills import Translators, ProgramManager
             ProgramManager(program, on_off).start_stop_program()
         if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
             alib.yesno_action(yes_no)
-        if action and max_intersection:  # выбор реакций модели на команды
-            alib.callfunc(command, action, max_intersection, onoff=on_off)
+        if action:  # выбор реакций модели на команды
+            alib.callfunc(command, action, onoff=on_off)

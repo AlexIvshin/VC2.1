@@ -5,11 +5,11 @@ import sys
 import random
 
 import dialog as dg
-from assistant import Assistant
 
+from assistant import Assistant
 talk = Assistant().speaks
 
-# Режимы и команды смены режима используются в choice_mode()
+# Режимы и команды смены режима, используются в choice_mode()
 notebook_mode = 'notebook'
 notebook_cmd = 'режим блокнота'
 default_mode = 'default'
@@ -60,7 +60,7 @@ def choice_xterm(category: str) -> str:
 
 
 def restart_app() -> None:
-    talk('Перезагружаюсь!')  # Ключевая фраза которая ловится в start_app.py
+    talk('Перезагружаюсь!')  # Ключевая фраза, которая ловится в start_app.py
     sys.exit()
 
 
@@ -75,18 +75,17 @@ def check_hand_input(words: str) -> bool:
         return True
 
 
-def choice_action(command: str, d: dict) -> tuple:
-    max_intersection, action = 0, None
+def choice_action(command: str, d: dict) -> str | None:
+    action = None
 
     for key, value in d.items():
-        len_val = len(set(value) & set(command.split(' ')))  # кол-во вхождений(пересечений)
-        if len_val > max_intersection:
-            max_intersection, action = len_val, key
-
-    if action:
-        return action, max_intersection
-    else:
-        return None, None
+        text_set = set(command.split(' '))
+        commands_set = set(d[key][1:])
+        crossings_threshold = d[key][0]
+        number_of_crossings = len(text_set & commands_set)  # кол-во вхождений(пересечений)
+        if number_of_crossings >= crossings_threshold:
+            action = key
+    return action
 
 
 def check_prg(command: str):  # Определяем програму и её наличие в системе
@@ -167,7 +166,6 @@ def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
 
         if mode == translator_mode:
             print('Mode: Translator', end='')
-
         if mode == reverse_mode:
             print('Mode: Translitor-reverse', end='')
 

@@ -3,12 +3,12 @@
 import os
 from dialog import notebook_action_dict, yes_no_dict
 from assistant import Assistant, stack
-from skills import FileLife
+from skills import File
 from typing import Union
 from wordstonum import word2num_ru as w2n
 import support_skills as ss
 
-file_action = FileLife()
+file_action = File()
 talk = Assistant().speaks
 
 homedir = file_action.homedir
@@ -39,7 +39,7 @@ def notebook_reacts(commandline: str) -> None:
     cmdline = commandline
     yes_no = ss.check_yesno_onoff(cmdline, dictionary=yes_no_dict)
     num_file = w2n(cmdline)
-    action, intersection = ss.choice_action(cmdline, notebook_action_dict)
+    action = ss.choice_action(cmdline, notebook_action_dict)
     mem_stack: list = stack.get_stack()
 
     if yes_no == 'cancel':
@@ -47,7 +47,7 @@ def notebook_reacts(commandline: str) -> None:
         return stack.clear_stack()
     print(f'Выбран файл: "{file}"') if file else None
 
-    if action and intersection > 1:
+    if action:
         stack.ad_element(action)
         globals()[action]()
 
