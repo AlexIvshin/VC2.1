@@ -127,7 +127,7 @@ thread = Thread(target=Assistant().listening)  # Создаём главный �
 is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком.
 
 
-def main() -> None:
+def startapp() -> None:
     text = AppWidget.text
     label = AppWidget.label
     info_label = AppWidget.info_label
@@ -142,4 +142,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    startapp()

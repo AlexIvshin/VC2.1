@@ -684,48 +684,54 @@ class SysInformer:
         return collect_info_dict
 
     @staticmethod
-    def print_info(dict_info: dict) -> None:
-
+    def print_info(dict_info: dict) -> list[str]:
+        sys_info = []
         for item in dict_info['info']:
             if item == "system_info":
                 for elem in dict_info['info'][item]:
-
                     if elem == 'system':
-                        print(f"[+] Информация о системе\n"
-                              f"  - Имя компьютера: {dict_info['info'][item][elem]['comp_name']}\n"
-                              f"  - Опереционная система: {dict_info['info'][item][elem]['os_name']}\n"
-                              f"  - Сборка: {dict_info['info'][item][elem]['version']}\n"
-                              f"  - Архитектура: {dict_info['info'][item][elem]['machine']}\n")
+                        sys_info.append(
+                            f"\n[+] Информация о системе:\n"
+                            f"    - Имя компьютера: {dict_info['info'][item][elem]['comp_name']}\n"
+                            f"    - Опереционная система: {dict_info['info'][item][elem]['os_name']}\n"
+                            f"    - Сборка: {dict_info['info'][item][elem]['version']}\n"
+                            f"    - Архитектура: {dict_info['info'][item][elem]['machine']}\n\n")
 
                     if elem == 'processor':
-                        print(f"[+] Информация о процессоре\n"
-                              f"  - Семейство: {dict_info['info'][item][elem]['name']}\n"
-                              f"  - Физические ядра: {dict_info['info'][item][elem]['phisycal_core']}\n"
-                              f"  - Всего ядер: {dict_info['info'][item][elem]['all_core']}\n"
-                              f"  - Максимальная частота: {dict_info['info'][item][elem]['freq_max']}\n")
+                        sys_info.append(
+                            f"[+] Информация о процессоре:\n"
+                            f"    - Семейство: {dict_info['info'][item][elem]['name']}\n"
+                            f"    - Физические ядра: {dict_info['info'][item][elem]['phisycal_core']}\n"
+                            f"    - Всего ядер: {dict_info['info'][item][elem]['all_core']}\n"
+                            f"    - Максимальная частота: {dict_info['info'][item][elem]['freq_max']}\n\n")
 
                     if elem == 'ram':
-                        print(f"[+] Оперативная память\n"
-                              f"  - Объем: {dict_info['info'][item][elem]['volume']}\n"
-                              f"  - Доступно: {dict_info['info'][item][elem]['aviable']}\n"
-                              f"  - Используется: {dict_info['info'][item][elem]['used']}\n")
+                        sys_info.append(
+                            f"[+] Оперативная память:\n"
+                            f"    - Объем: {dict_info['info'][item][elem]['volume']}\n"
+                            f"    - Доступно: {dict_info['info'][item][elem]['aviable']}\n"
+                            f"    - Используется: {dict_info['info'][item][elem]['used']}\n\n")
 
             if item == "disk_info":
                 for elem in dict_info['info'][item]:
-                    print(f"[+] Информация о дисках\n"
-                          f"  - Имя диска: {elem}\n"
-                          f"  - Файловая система: {dict_info['info'][item][elem]['file_system']}\n"
-                          f"  - Объем диска: {dict_info['info'][item][elem]['size_total']}\n"
-                          f"  - Занято: {dict_info['info'][item][elem]['size_used']}\n"
-                          f"  - Свободно: {dict_info['info'][item][elem]['size_free']}\n"
-                          f"  - Заполненность: {dict_info['info'][item][elem]['percent']}%\n")
+                    sys_info.append(
+                        f"[+] Информация о дисках:\n"
+                        f"    - Имя диска: {elem}\n"
+                        f"    - Файловая система: {dict_info['info'][item][elem]['file_system']}\n"
+                        f"    - Объем диска: {dict_info['info'][item][elem]['size_total']}\n"
+                        f"    - Занято: {dict_info['info'][item][elem]['size_used']}\n"
+                        f"    - Свободно: {dict_info['info'][item][elem]['size_free']}\n"
+                        f"    - Заполненность: {dict_info['info'][item][elem]['percent']}%\n\n")
 
             if item == "net_info":
                 for elem in dict_info['info'][item]:
-                    print(f"[+] Информация о сети\n"
-                          f"  - Имя интерфейса: {elem}\n"
-                          f"  - MAC-адрес: {dict_info['info'][item][elem]['mac']}\n"
-                          f"  - Local IP: {dict_info['info'][item][elem]['local_ip']}\n")
+                    sys_info.append(
+                        f"[+] Информация о сети\n"
+                        f"    - Имя интерфейса: {elem}\n"
+                        f"    - MAC-адрес: {dict_info['info'][item][elem]['mac']}\n"
+                        f"    - Local IP: {dict_info['info'][item][elem]['local_ip']}\n\n")
+
+        return sys_info
 
     @staticmethod
     def sys_monitoring() -> None:
@@ -775,9 +781,9 @@ class SysInformer:
         print(f'-infolabele-■ Core temp: {core_temp}°  ■ GPU temp: {gpu_temp}°  ■ '
               f'Mem used: {ram_per_used}%  ■ SWAP Used: {swap_str}  ■ Runtime: no process', end='')
 
-    def get_sysinfo(self) -> None:
+    def get_sysinfo(self) -> list[str]:
         sysinfo = self.create_sysinfo()
-        self.print_info(sysinfo)
+        return self.print_info(sysinfo)
 
 
 class AssistantSettings:
@@ -1021,8 +1027,3 @@ class File:
             talk(f'Действительно удалить файл?')
             print(f'"{file}"')
             return 'not permission'
-
-
-if __name__ == '__main__':
-    sinfo = SysInformer()
-    sinfo.get_sysinfo()

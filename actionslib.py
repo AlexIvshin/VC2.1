@@ -63,11 +63,11 @@ def callfunc(command_line: str, action: str, onoff=None) -> None:
 
 
 def hello() -> None:
-    talk(random.choice(dg.hello_answer))
+    return talk(random.choice(dg.hello_answer))
 
 
 def thanks_output() -> None:
-    talk(random.choice(dg.answer_thanks))
+    return talk(random.choice(dg.answer_thanks))
 
 
 def i_am_output() -> None:
@@ -79,23 +79,23 @@ def i_am_output() -> None:
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
 def mode_anonim() -> None:
-    skills.Anonimizer(on_off).start_stop_anonimizer()
+    return skills.Anonimizer(on_off).start_stop_anonimizer()
 
 
 def start_script(foo_str: str) -> None:
-    skills.ScriptStarter(foo_str).run_script()
+    return skills.ScriptStarter(foo_str).run_script()
 
 
 def search() -> None:
-    skills.SearchEngine(cmdline, function).get_result()
+    return skills.SearchEngine(cmdline, function).get_result()
 
 
 def calculate() -> None:
-    skills.Calculator(cmdline).tell_the_result()
+    return skills.Calculator(cmdline).tell_the_result()
 
 
 def weather() -> None:
-    skills.Sinoptik(cmdline).get_weather_forecast()
+    return skills.Sinoptik(cmdline).get_weather_forecast()
 
 
 def stop_app() -> None:
@@ -104,37 +104,37 @@ def stop_app() -> None:
 
 
 def app_reboot() -> None:
-    ss.restart_app()
+    return ss.restart_app()
 
 
 def sys_down() -> None:
-    call_reboot_down('sys_down')
+    return call_reboot_down('sys_down')
 
 
 def sys_reboot() -> None:
-    call_reboot_down('sys_reboot')
+    return call_reboot_down('sys_reboot')
 
 
 def conf_settings() -> None:
-    skills.AssistantSettings(cmdline).change_conf_set()
+    return skills.AssistantSettings(cmdline).change_conf_set()
 
 
 def volume_settings() -> None:
-    skills.AssistantSettings(cmdline).change_volume()
+    return skills.AssistantSettings(cmdline).change_volume()
 
 
 def random_joke() -> None:
     global last_cmdline, last_function
     last_function = 'random_joke'
     last_cmdline = cmdline
-    skills.Polyhistor(cmdline).get_result()
+    return skills.Polyhistor(cmdline).get_result()
 
 
 def show_sys_info() -> None:
+    from widgets.sysinfo_widget import show_sysinfo
     ss.answer_ok_and_pass()
-    puth = f'{homedir}/skills.py'
-    run(f'{ss.choice_xterm("XtermInfo")} python3 {puth} &', shell=True)
+    return show_sysinfo()
 
 
 def exchange_rates() -> None:
-    skills.ExchangeRates(cmdline).get_exchange_rates()
+    return skills.ExchangeRates(cmdline).get_exchange_rates()

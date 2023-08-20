@@ -18,7 +18,7 @@ class AppWidget:
     h = int(config['WidgetSize']['height'])
     x = int((displaysize_x - w) / 2)
     root.geometry(f"{w}x{h}+{x}+20")
-    root.title('VCom 2.1')
+    root.title(title_app)
     root.resizable(False, False)
     root.wait_visibility(root)
     root.wm_attributes("-alpha", 0.8)
