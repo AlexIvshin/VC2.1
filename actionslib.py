@@ -8,8 +8,9 @@ from subprocess import run
 import dialog as dg
 import skills
 import support_skills as ss
-from assistant import Assistant
+from widgets.sysinfo_widget import show_sysinfo
 
+from assistant import Assistant
 talk = Assistant().speaks
 
 homedir = os.getcwdb().decode(encoding='utf-8')
@@ -131,7 +132,6 @@ def random_joke() -> None:
 
 
 def show_sys_info() -> None:
-    from widgets.sysinfo_widget import show_sysinfo
     ss.answer_ok_and_pass()
     return show_sysinfo()
 

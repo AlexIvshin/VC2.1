@@ -1,13 +1,18 @@
 import tkinter as tk
+
 from skills import SysInformer
+info = SysInformer()
 
 
 class InfoWidget:
-    sysinfo = SysInformer().get_sysinfo()
+
+    @staticmethod
+    def insert_text(text_field) -> None:
+        [text_field.insert('end', string) for string in info.get_sysinfo()]
 
     infowid = tk.Tk()
     infowid.geometry(f"580x900+10+10")
-    infowid.title('Sys Info')
+    infowid.title('System Information')
     infowid.wm_attributes("-alpha", 0.9)
 
     text = tk.Text(
@@ -23,8 +28,7 @@ class InfoWidget:
         wrap='word',
         padx=7)
 
-    for string in sysinfo:
-        text.insert('end', string)
+    insert_text(text)
 
     text.mark_set('insert', 'end')
     text.pack(fill='x')
