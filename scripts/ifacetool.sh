@@ -23,7 +23,6 @@ symb="${grey}<${noco}"
 symbs="${grey}>>> ${noco}"
 symb_ok="${green}[+] ${noco}"
 symb_no="${red}[-] ${noco}"
-#symb_warning="${yellow}[!] ${noco}"
 choice_option_line="${sky} Выбери опцию:${noco}"
 choice_iface_line="${bordob}    Выбери другой или введи <${noco} q ${bordob}>, чтобы выйти!${noco}"
 bad_choice="${red} Не корректный выбор!${noco}"
@@ -87,11 +86,8 @@ Line_gen() {
 Check_env() {
 
     case ${env} in
-
         "iface_tools") Line_gen 48 "~" " IFACE TOOLS " "${bordob}"; ;;
-
              "ifaces") Line_gen 48 "~" " INTERFACES " "${bordob}"; ;;
-
        "rename_iface") Line_gen 48 "~" " RENAME " "${bordob}"; ;;
     esac
 }
