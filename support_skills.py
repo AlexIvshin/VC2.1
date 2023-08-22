@@ -48,17 +48,15 @@ def choice_xterm(category: str) -> str:
     title = ctgr
 
     x, y = int(config[ctgr]['x']), int(config[ctgr]['y'])
-    fg, bg, fontsize = config[ctgr]['fg'], config[ctgr]['bg'], int(config[ctgr]['fontsize'])
-    fontname = config[ctgr]['font']
+    fg, bg, fsize = config[ctgr]['fg'], config[ctgr]['bg'], int(config[ctgr]['fontsize'])
+    fname = config[ctgr]['font']
 
     if ctgr == 'XtermSearch':
-        pos_x, pos_y = xterm_x_position(x), 380
+        pos_x, pos_y, hold = xterm_x_position(x), 380, '-hold'
     else:
-        pos_x, pos_y = 10, 20
+        pos_x, pos_y, hold = 10, 20, ''
 
-    hold = '-hold' if ctgr in category_list[2:] else ''
-    return (f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y}'
-            f' -fa {fontname} -fs {fontsize} {hold} -e')
+    return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa {fname} -fs {fsize} {hold} -e'
 
 
 def restart_app() -> None:
@@ -79,13 +77,9 @@ def check_hand_input(words: str) -> bool:
 
 def choice_action(command: str, d: dict) -> str | None:
     action = None
-
-    for key, value in d.items():
-        text_set = set(command.split(' '))
-        commands_set = set(d[key][1:])
-        crossings_threshold = d[key][0]
-        number_of_crossings = len(text_set & commands_set)  # кол-во вхождений(пересечений)
-        if number_of_crossings >= crossings_threshold:
+    for key in d.keys():
+        # Проверка минимально допустимого кол-во вхождений(пересечений) для выбора реакции.
+        if len(set(command.split(' ')) & set(d[key][1:])) >= d[key][0]:
             action = key
     return action
 
@@ -134,7 +128,6 @@ def check_internet() -> bool:  # internet check feature
     try:
         socket.setdefaulttimeout(timeout)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        print('  Интернет... OK')
         return True
     except socket.error as e:
         print(e)

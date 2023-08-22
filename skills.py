@@ -69,6 +69,10 @@ class Calculator:
             pass
 
     def get_calc_elem(self) -> tuple[float | int, str | None, float | int] | tuple[None, None, None]:
+        opers: dict = {
+            'плюс': '+', 'минус': '-', 'отнять': '-', 'умножить на': '*', 'множить на': '*',
+            'разделить на': '/', 'раздели на': '/', 'дели на': '/', 'делить на': '/'
+        }
         calc_string = w2n(self.cmd, otherwords=True).split()
         interval: list = []
         for i in calc_string:
@@ -79,7 +83,7 @@ class Calculator:
         if len(interval) == 2:
             n1, n2 = self.check_type_num(calc_string[interval[0]]), self.check_type_num(calc_string[interval[1]])
             opr_str = ' '.join(calc_string[interval[0] + 1:interval[1]])
-            operator: str = dg.opers[opr_str] if opr_str in dg.opers.keys() else None
+            operator: str = opers[opr_str] if opr_str in opers.keys() else None
             if operator:
                 return n1, operator, n2
         return None, None, None
@@ -880,11 +884,11 @@ class ScriptStarter:
         self.script_key = script_key
 
     def get_script(self) -> tuple[str, str]:
-        script, script_name = None, ''.join(self.script_key.split('_')[-1])
-        sudo = 'sudo' if ''.join(self.script_key.split('_')[-2]) == 'sudo' else ''
-        category = "XtermSmall" if script_name == 'nmstart' or script_name == 'cleancashe' else "Xterm"
-        script = f'{ss.choice_xterm(category)} {sudo} {self.DIR}./{script_name}.sh &'
-        return script, script_name
+        scr_name = ''.join(self.script_key.split('_')[-1])
+        sudo = 'sudo' if 'sudo' in self.script_key else ''
+        category = ''.join(self.script_key.split('_')[-2])
+        scr_str = f'{ss.choice_xterm(category)} {sudo} {self.DIR}./{scr_name}.sh &'
+        return scr_str, scr_name
 
     def run_script(self) -> None:
         scr, scr_name = self.get_script()
