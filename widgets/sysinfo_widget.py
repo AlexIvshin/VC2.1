@@ -1,19 +1,17 @@
 import tkinter as tk
-
 from skills import SysInformer
-info = SysInformer()
 
 
 class InfoWidget:
 
     @staticmethod
-    def insert_text(text_field) -> None:
-        [text_field.insert('end', string) for string in info.get_sysinfo()]
+    def insert_text(text_field: tk.Text) -> None:
+        [text_field.insert('end', string) for string in SysInformer().get_sysinfo()]
 
     infowid = tk.Tk()
-    infowid.geometry(f"580x900+10+10")
+    infowid.geometry(f"580x935+10+20")
     infowid.title('System Information')
-    infowid.wm_attributes("-alpha", 0.9)
+    infowid.wm_attributes("-alpha", 0.8)
 
     text = tk.Text(
         infowid,
@@ -34,6 +32,5 @@ class InfoWidget:
     text.pack(fill='x')
 
 
-def show_sysinfo():
-    widget = InfoWidget.infowid
-    widget.mainloop()
+def show_sysinfo() -> None:
+    InfoWidget.infowid.mainloop()

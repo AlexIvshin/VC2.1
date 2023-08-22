@@ -43,20 +43,22 @@ def choice_xterm(category: str) -> str:
     config = configparser.ConfigParser()
     config.read(pathlib.Path(__file__).parent.absolute() / "settings.ini")
 
-    category_list = ['Xterm', 'XtermSmall', 'XtermInfo', 'XtermSearch']
+    category_list = ['Xterm', 'XtermSmall', 'XtermSearch']
     ctgr = 'Xterm' if category not in category_list else category
     title = ctgr
 
     x, y = int(config[ctgr]['x']), int(config[ctgr]['y'])
     fg, bg, fontsize = config[ctgr]['fg'], config[ctgr]['bg'], int(config[ctgr]['fontsize'])
+    fontname = config[ctgr]['font']
 
-    if ctgr == 'XtermInfo':
-        pos_x, pos_y = 10, 20
+    if ctgr == 'XtermSearch':
+        pos_x, pos_y = xterm_x_position(x), 380
     else:
-        pos_x, pos_y = xterm_x_position(x), 370
+        pos_x, pos_y = 10, 20
 
     hold = '-hold' if ctgr in category_list[2:] else ''
-    return f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y} -fa fixed -fs {fontsize} {hold} -e'
+    return (f'xterm -T {title} -fg {fg} -bg {bg} -geometry {x}x{y}+{pos_x}+{pos_y}'
+            f' -fa {fontname} -fs {fontsize} {hold} -e')
 
 
 def restart_app() -> None:

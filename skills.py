@@ -7,6 +7,8 @@ import re
 import requests
 from subprocess import run, check_output, call
 import time
+import GPUtil
+import psutil
 
 from typing import Union, Optional, Any
 
@@ -684,8 +686,17 @@ class SysInformer:
         return collect_info_dict
 
     @staticmethod
-    def print_info(dict_info: dict) -> list[str]:
+    def pars_info(dict_info: dict) -> list[str]:
         sys_info = []
+        gpus = GPUtil.getGPUs()
+        gpu_name = gpu_total_mem = gpu_free_mem = 'Нет данных'
+
+        for gpu in gpus:
+            if gpu.display_active == gpu.display_mode == 'Enabled':
+                gpu_name = gpu.name
+                gpu_total_mem = f'{int(gpu.memoryTotal)}Mb'
+                gpu_free_mem = f'{int(gpu.memoryFree)}Mb'
+
         for item in dict_info['info']:
             if item == "system_info":
                 for elem in dict_info['info'][item]:
@@ -731,12 +742,16 @@ class SysInformer:
                         f"    - MAC-адрес: {dict_info['info'][item][elem]['mac']}\n"
                         f"    - Local IP: {dict_info['info'][item][elem]['local_ip']}\n\n")
 
+        sys_info.append(
+            f"[+] Информация о видеокарте\n"
+            f"    - Модель: {gpu_name}\n"
+            f"    - Обьём памяти: {gpu_total_mem}\n"
+            f"    - Свободно памяти: {gpu_free_mem}\n")
+
         return sys_info
 
     @staticmethod
     def sys_monitoring() -> None:
-        import GPUtil
-        import psutil
         core_temp_warning = 90
         core_temp_critical = 95
         gpu_temp_warning = 93
@@ -783,7 +798,7 @@ class SysInformer:
 
     def get_sysinfo(self) -> list[str]:
         sysinfo = self.create_sysinfo()
-        return self.print_info(sysinfo)
+        return self.pars_info(sysinfo)
 
 
 class AssistantSettings:
@@ -866,11 +881,9 @@ class ScriptStarter:
 
     def get_script(self) -> tuple[str, str]:
         script, script_name = None, ''.join(self.script_key.split('_')[-1])
-
-        if script_name == 'nmstart' or script_name == 'cleancashe':
-            script = f'{ss.choice_xterm("XtermSmall")} sudo {self.DIR}./{script_name}.sh &'
-        elif script_name == 'sysfullupgrade':
-            script = f'{ss.choice_xterm("Xterm")} sudo {self.DIR}./{script_name}.sh &'
+        sudo = 'sudo' if ''.join(self.script_key.split('_')[-2]) == 'sudo' else ''
+        category = "XtermSmall" if script_name == 'nmstart' or script_name == 'cleancashe' else "Xterm"
+        script = f'{ss.choice_xterm(category)} {sudo} {self.DIR}./{script_name}.sh &'
         return script, script_name
 
     def run_script(self) -> None:
@@ -880,7 +893,7 @@ class ScriptStarter:
         run(scr, shell=True)
         print(f'  Script: Run {scr_name}.sh')
         passwd = True if 'sudo' in scr else False
-        ss.answer_ok_and_pass(enter_pass=passwd)
+        ss.answer_ok_and_pass(answer=False, enter_pass=passwd)
 
 
 class Anonimizer:

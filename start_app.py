@@ -13,7 +13,7 @@ from dialog import title_app
 from skills import SysInformer
 from widgets.app_widget import AppWidget
 
-run_script: bool = False
+run_flag: bool = False
 num_scripts_to_run = 0
 
 
@@ -77,11 +77,11 @@ class TextWrapper:
 
 
 def check_run_scr() -> None:
-    global run_script, num_scripts_to_run
+    global run_flag, num_scripts_to_run
     run_scripts = []
     """
-    This function monitors the execution of scripts in the system. (only reacts to files with "sh" extension)
-    Эта функция мониторит выполнение скриптов в системе. (реагирует только на файлы с расширением "sh")
+    This function monitors the execution of scripts in the XTERM.
+    Эта функция мониторит выполнение скриптов в XTERM.
     """
 
     def report_completion() -> None:
@@ -89,25 +89,25 @@ def check_run_scr() -> None:
         talk(' Скрипт выполнен!', print_str=f'  Script: Completed!')
 
     try:
-        pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ".sh" ', encoding='utf-8', shell=True).strip()
-        [run_scripts.append(i.split('/')[-1]) for i in pgrep_str.split('\n')]
+        pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ./ ', encoding='utf-8', shell=True).strip()
+        [run_scripts.append(i.split('/')[-1]) if i not in run_scripts else None for i in pgrep_str.split('\n')]
         n = len(run_scripts)
         if num_scripts_to_run > n:
             report_completion()
         num_scripts_to_run = n
-        run_script = True
+        run_flag = True
 
     except sub.CalledProcessError:
         num_scripts_to_run = 0
+        if run_flag:
+            run_flag = False
+            report_completion()
         pass
-
-    if run_script and num_scripts_to_run == 0:
-        run_script = False
-        report_completion()
 
 
 def thread_monitoring() -> None:
     sysmonitor = SysInformer()
+    __interval = 2
     """
     This function in a loop with an interval of 2 seconds monitors the main thread "tread",
     and if it is interrupted, closes the main widget, and monitors the system and the execution of bash scripts.
@@ -120,7 +120,7 @@ def thread_monitoring() -> None:
             return AppWidget.close_widget()
         check_run_scr()
         sysmonitor.sys_monitoring()
-        time.sleep(2)
+        time.sleep(__interval)
 
 
 thread = Thread(target=Assistant().listening)  # Создаём главный поток.
