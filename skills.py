@@ -471,23 +471,42 @@ class ExchangeRates:
         self.commandline = commandline
 
     @staticmethod
-    def correct_value_rate(float_num: float) -> str:
-        try:
-            rate = round(float_num, 2)
-            res = f'{str(rate)}0' if len(str(rate).split('.')[1]) == 1 else str(rate)
-            return f'{int(rate)} гривен' if int(rate) == float(rate) else f'{res.replace(".", " гривен ")} копеек'
-        except ValueError:
-            pass
+    def get_correct_value_rate(float_num: float) -> str:
+
+        if type(float_num) != float:
+            return 'no data'
+
+        rate = round(float_num, 2)
+        rate_str = f'{str(rate)}0' if len(str(rate).split('.')[1]) == 1 else str(rate)
+        rate_str = rate_str.replace(
+            rate_str.split('.')[-1],
+            str(int(rate_str.split('.')[-1])))
+
+        g = int(rate_str.split('.')[0][-1])
+        k = int(rate_str.split('.')[1][-1])
+        grn = 'гривен'
+
+        if g == 1:
+            grn = 'гривна'
+        if 5 > g > 1:
+            grn = 'гривны'
+        if int(rate) != float(rate):
+            kop = 'копеек'
+            if k == 1:
+                kop = 'копейка'
+            if 5 > k > 1:
+                kop = 'копейки'
+            return f'{rate_str.replace(".", f" {grn} ")} {kop}.'
+
+        return f'{int(rate)} {grn}'
 
     def determine_the_currency(self) -> tuple[str, str]:
         key = 'usd'
         currency = 'доллара'
-
         if 'евро' in self.commandline:
             key, currency = 'eur', 'евро'
         elif 'злот' in self.commandline or 'польск' in self.commandline:
             key, currency = 'pln', 'польского злотого'
-
         return key, currency
 
     def get_exchange_rates(self) -> None:
@@ -540,7 +559,7 @@ class ExchangeRates:
 
             print()
             talk(f'В {bank_name}е курс {currency} к гривне сегодня:')
-            talk(f' Покупка: {self.correct_value_rate(buy)}. Продажа: {self.correct_value_rate(sale)}.')
+            talk(f' Покупка: {self.get_correct_value_rate(buy)}. Продажа: {self.get_correct_value_rate(sale)}.')
 
         except requests.exceptions.ConnectionError:
             print('Ups(')

@@ -52,6 +52,7 @@ def notebook_reacts(commandline: str) -> None:
         globals()[action]()
 
     if isinstance(num_file, int) and mem_stack:
+        print(stack, num_file)
         if len(mem_stack) > 1 and mem_stack[-1] == 'choice_file':
             file = choice_file(num=num_file)
             action = mem_stack[0]

@@ -92,7 +92,7 @@ class Listener:
                     result = rec.Result()
                     text = js.loads(result)['text']
 
-                    if len(text) > 0:
+                    if len(text) > 1:
                         print('◄ ' + text.capitalize())
                         start = time.time()
                         Reactor(text).get_foo_name()
