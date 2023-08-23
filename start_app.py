@@ -8,13 +8,13 @@ from threading import Thread
 import time
 import subprocess as sub
 
-from assistant import Assistant
+from assistant import Listener, Voice
 from dialog import title_app
 from skills import SysInformer
 from widgets.app_widget import AppWidget
 
 run_flag: bool = False
-num_scripts_to_run = 0
+num_scr_to_run = 0
 
 
 class TextWrapper:
@@ -57,8 +57,8 @@ class TextWrapper:
             self.text_field.see('end')
             self.text_field.tag_add('input', index_str, 'end')
             self.text_field.tag_add('output', index_str, 'end')
-            rm_tag = work_tag = color = ''
 
+            rm_tag = work_tag = color = ''
             if '◄' in text:
                 rm_tag, work_tag, color = 'output', 'input', input_color
             elif '►' in text:
@@ -77,7 +77,7 @@ class TextWrapper:
 
 
 def check_run_scr() -> None:
-    global run_flag, num_scripts_to_run
+    global run_flag, num_scr_to_run
     run_scripts = []
     """
     This function monitors the execution of scripts in the XTERM.
@@ -85,20 +85,20 @@ def check_run_scr() -> None:
     """
 
     def report_completion() -> None:
-        talk = Assistant().speaks
+        talk = Voice().speaks
         talk(' Скрипт выполнен!', print_str=f'  Script: Completed!')
 
     try:
         pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ./ ', encoding='utf-8', shell=True).strip()
         [run_scripts.append(i.split('/')[-1]) if i not in run_scripts else None for i in pgrep_str.split('\n')]
-        n = len(run_scripts)
-        if num_scripts_to_run > n:
+        last_num = len(run_scripts)
+        if num_scr_to_run > last_num:
             report_completion()
-        num_scripts_to_run = n
+        num_scr_to_run = last_num
         run_flag = True
 
     except sub.CalledProcessError:
-        num_scripts_to_run = 0
+        num_scr_to_run = 0
         if run_flag:
             run_flag = False
             report_completion()
@@ -109,7 +109,7 @@ def thread_monitoring() -> None:
     sysmonitor = SysInformer()
     __interval = 2
     """
-    This function in a loop with an interval of 2 seconds monitors the main thread "tread",
+    This function in a loop with an interval of 2 sec monitors the main thread "tread",
     and if it is interrupted, closes the main widget, and monitors the system and the execution of bash scripts.
     Эта функция в цикле с интервалом 2 сек следит за главным потоком tread, и если он прерван,
     закрывает главный виджет, а также мониторится система и исполнение bash-скриптов.
@@ -123,7 +123,7 @@ def thread_monitoring() -> None:
         time.sleep(__interval)
 
 
-thread = Thread(target=Assistant().listening)  # Создаём главный поток.
+thread = Thread(target=Listener().audio_stream_capture)  # Создаём главный поток.
 is_alive_thread = Thread(target=thread_monitoring)  # Создаём поток слежки за главным потоком.
 
 

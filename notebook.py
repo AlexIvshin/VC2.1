@@ -2,14 +2,14 @@
 
 import os
 from dialog import notebook_action_dict, yes_no_dict
-from assistant import Assistant, stack
+from assistant import Voice, stack
 from skills import File
 from typing import Union
 from wordstonum import word2num_ru as w2n
 import support_skills as ss
 
 file_action = File()
-talk = Assistant().speaks
+talk = Voice().speaks
 
 homedir = file_action.homedir
 note_dir = file_action.note_dir

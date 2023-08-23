@@ -12,14 +12,14 @@ import psutil
 
 from typing import Union, Optional, Any
 
-from assistant import Assistant
+from assistant import Voice
 import dialog as dg
 from wordstonum import word2num_ru as w2n
 import support_skills as ss
 from widgets.hand_input_widget import get_input
 
-talk = Assistant().speaks
-mic_sins = Assistant().mic_sensitivity
+talk = Voice().speaks
+mic_sins = Voice().mic_sensitivity
 
 homedir = os.getcwdb().decode(encoding='utf-8')
 

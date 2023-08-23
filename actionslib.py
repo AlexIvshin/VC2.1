@@ -8,35 +8,29 @@ from subprocess import run
 import dialog as dg
 import skills
 import support_skills as ss
-from widgets.sysinfo_widget import show_sysinfo
 
-from assistant import Assistant
-talk = Assistant().speaks
+from assistant import Voice
+talk = Voice().speaks
 
 homedir = os.getcwdb().decode(encoding='utf-8')
 scriptdir: str = f'{homedir}/scripts/'
 
-last_function = ''
-last_cmdline = ''
-yes_no = ''
-global cmdline, command_word, function, on_off
+last_function = last_cmdline = ''
+global cmdline, function, on_off
 
 
 def yesno_action(yesno: str) -> None:
-    global last_function, last_cmdline, yes_no
-    yes_no = yesno
+    global last_function, last_cmdline
 
-    if yes_no == 'yes' and last_function and last_cmdline:
+    if yesno == 'yes' and last_function and last_cmdline:
         globals()[last_function]()
-    elif yes_no == 'no':
-        last_function = ''
-        last_cmdline = ''
+    elif yesno == 'no':
+        last_function = last_cmdline = ''
 
 
 def confirm_action(foo_name: str) -> None:
     global last_cmdline, last_function
-    last_function = foo_name
-    last_cmdline = cmdline
+    last_function, last_cmdline = foo_name, cmdline
     talk(f'Вы уверены?')
 
 
@@ -54,9 +48,8 @@ def call_reboot_down(action: str) -> None:
 
 
 def callfunc(command_line: str, action: str, onoff=None) -> None:
-    global function, cmdline, command_word, on_off
+    global function, cmdline, on_off
     cmdline = command_line
-    command_word = set(command_line.split(' '))
     function = action
     on_off = onoff
 
@@ -72,7 +65,7 @@ def thanks_output() -> None:
 
 
 def i_am_output() -> None:
-    if len(command_word) < 4:
+    if len(cmdline.split(' ')) < 4:
         intersection_word = ss.get_intersection_word(function, cmdline, dg.actions_dict)
         if ss.check_word_sequence(cmdline, intersection_word):
             talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
@@ -132,6 +125,7 @@ def random_joke() -> None:
 
 
 def show_sys_info() -> None:
+    from widgets.sysinfo_widget import show_sysinfo
     ss.answer_ok_and_pass()
     return show_sysinfo()
 

@@ -6,8 +6,8 @@ import random
 
 import dialog as dg
 
-from assistant import Assistant
-talk = Assistant().speaks
+from assistant import Voice
+talk = Voice().speaks
 
 # Режимы и команды смены режима, используются в choice_mode()
 notebook_mode = 'notebook'
