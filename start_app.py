@@ -88,21 +88,17 @@ def check_run_scr() -> None:
         talk = Voice().speaks
         talk(' Скрипт выполнен!', print_str=f'  Script: Completed!')
 
-    try:
+    if sub.call(f'pgrep -a xterm | grep -F ./ >/dev/null', shell=True) == 0:
         pgrep_str = sub.check_output(f'pgrep -a xterm | grep -F ./ ', encoding='utf-8', shell=True).strip()
         [run_scripts.append(i.split('/')[-1]) if i not in run_scripts else None for i in pgrep_str.split('\n')]
-        last_num = len(run_scripts)
-        if num_scr_to_run > last_num:
-            report_completion()
-        num_scr_to_run = last_num
+        report_completion() if num_scr_to_run > len(run_scripts) else None
+        num_scr_to_run = len(run_scripts)
         run_flag = True
-
-    except sub.CalledProcessError:
-        num_scr_to_run = 0
-        if run_flag:
-            run_flag = False
-            report_completion()
-        pass
+        return
+    num_scr_to_run = 0
+    if run_flag:
+        run_flag = False
+        report_completion()
 
 
 def thread_monitoring() -> None:
@@ -115,12 +111,12 @@ def thread_monitoring() -> None:
     закрывает главный виджет, а также мониторится система и исполнение bash-скриптов.
     """
 
-    while True:
-        if not thread.is_alive():
-            return AppWidget.close_widget()
+    while thread.is_alive():
         check_run_scr()
         sysmonitor.sys_monitoring()
         time.sleep(__interval)
+
+    return AppWidget.close_widget()
 
 
 thread = Thread(target=Listener().audio_stream_capture)  # Создаём главный поток.
