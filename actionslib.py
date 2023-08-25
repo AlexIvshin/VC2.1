@@ -31,7 +31,7 @@ def yesno_action(yesno: str) -> None:
 def confirm_action(foo_name: str) -> None:
     global last_cmdline, last_function
     last_function, last_cmdline = foo_name, cmdline
-    talk(f'Вы уверены?')
+    return talk(f'Вы уверены?')
 
 
 def call_reboot_down(action: str) -> None:
@@ -44,7 +44,7 @@ def call_reboot_down(action: str) -> None:
         return execute_command('systemctl poweroff')
     elif last_function == action == 'sys_reboot':
         return execute_command('systemctl reboot')
-    confirm_action(action)
+    return confirm_action(action)
 
 
 def callfunc(command_line: str, action: str, onoff=None) -> None:
@@ -52,8 +52,7 @@ def callfunc(command_line: str, action: str, onoff=None) -> None:
     cmdline = command_line
     function = action
     on_off = onoff
-
-    start_script(function) if 'start_script' in function else globals()[function]()
+    return start_script(function) if 'start_script' in function else globals()[function]()
 
 
 def hello() -> None:
@@ -65,10 +64,9 @@ def thanks_output() -> None:
 
 
 def i_am_output() -> None:
-    if len(cmdline.split(' ')) < 4:
-        intersection_word = ss.get_intersection_word(function, cmdline, dg.actions_dict)
-        if ss.check_word_sequence(cmdline, intersection_word):
-            talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
+    if (len(cmdline.split(' ')) < 4
+            and ss.check_word_sequence(cmdline, ss.get_intersection_word(function, cmdline, dg.actions_dict))):
+        return talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
 
 
 # Пускаем весь интернет-трафик через Tor + toriptables2
@@ -94,7 +92,7 @@ def weather() -> None:
 
 def stop_app() -> None:
     talk(random.choice(dg.answer_goodby))
-    sys.exit()
+    return sys.exit()
 
 
 def app_reboot() -> None:

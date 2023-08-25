@@ -138,17 +138,17 @@ def check_internet() -> bool:  # internet check feature
 def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
     mode = var_mode
 
-    if mode != sleep_mode and change_mode_cmd == notebook_cmd \
-            or mode == notebook_mode and change_mode_cmd != default_cmd:
+    if (mode != sleep_mode and change_mode_cmd == notebook_cmd
+            or mode == notebook_mode and change_mode_cmd != default_cmd):
         if change_mode_cmd == notebook_cmd:
             talk('Режим блокнота активирован!')
         print('Mode: Notebook', end='')
         mode = notebook_mode
 
-    if mode != sleep_mode and change_mode_cmd == translator_cmd \
-            or mode == translator_mode and change_mode_cmd != default_cmd \
-            or mode == reverse_mode and change_mode_cmd != default_cmd \
-            or change_mode_cmd == reverse_cmd:
+    if (mode != sleep_mode and change_mode_cmd == translator_cmd
+            or mode == translator_mode and change_mode_cmd != default_cmd
+            or mode == reverse_mode and change_mode_cmd != default_cmd
+            or change_mode_cmd == reverse_cmd):
 
         if change_mode_cmd == translator_cmd:
             talk('Переводчик активирован!')
@@ -171,9 +171,8 @@ def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
         print('Mode: Sleep...!', end='')
         mode = sleep_mode
 
-    if change_mode_cmd == default_cmd \
-            and mode != sleep_mode \
-            or change_mode_cmd == wakeup_cmd:
+    if (change_mode_cmd == default_cmd and mode != sleep_mode
+            or change_mode_cmd == wakeup_cmd):
         talk('Обычный режим активирован!')
 
         if change_mode_cmd == wakeup_cmd:
