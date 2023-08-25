@@ -8,7 +8,8 @@ from threading import Thread
 import time
 import subprocess as sub
 
-from assistant import Listener, Voice
+from assistant import Listener
+from model_voice import Voice
 from dialog import title_app
 from skills import SysInformer
 from widgets.app_widget import AppWidget

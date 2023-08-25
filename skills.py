@@ -5,14 +5,14 @@ import os
 import random
 import re
 import requests
-from subprocess import run, check_output, call
+from subprocess import run, check_output, call, CompletedProcess
 import time
 import GPUtil
 import psutil
 
 from typing import Union, Optional, Any
 
-from assistant import Voice
+from model_voice import Voice
 import dialog as dg
 from wordstonum import word2num_ru as w2n
 import support_skills as ss
@@ -30,29 +30,21 @@ class ProgramManager:
         self.program = program
         self.action = action
 
-    def get_program_name(self) -> str:
-        if self.action == 'off':
-            if self.program == 'google-chrome':
-                return 'chrome'
-            if self.program == 'sudo virtualbox':
-                return 'VirtualBox'
-        return self.program
+    def start_stop_program(self) -> CompletedProcess[bytes]:
+        prg = self.program
 
-    def start_stop_program(self):
-        prg = self.get_program_name()
         ss.answer_ok_and_pass()
 
         if self.action == 'on':
-            print(f'  {prg.capitalize()} starts!')
-            if prg == 'tor':
-                return run(f'~/tor-browser/Browser/start-tor-browser >/dev/null 2>&1 &', shell=True)
+            prg = '~/tor-browser/Browser/start-tor-browser' if prg == 'tor' else prg
+            print(f'  {self.program.capitalize()} starts!')
             return run(f'{prg} >/dev/null 2>&1 &', shell=True)
 
-        if self.action == 'off' and call(f'pgrep {prg} >/dev/null', shell=True) == 0:
-            print(f'  {prg.capitalize()} will be closed!')
-            if prg == 'VirtualBox':
-                return run(f'sudo pkill {prg} >/dev/null 2>&1', shell=True)
-            return run(f'pkill {prg} >/dev/null 2>&1', shell=True)
+        if self.action == 'off':
+            prg = 'chrome' if prg == 'google-chrome' else prg
+            if call(f'pgrep {prg} >/dev/null', shell=True) == 0:
+                print(f'  {prg.capitalize()} will be closed!')
+                return run(f'pkill {prg} >/dev/null 2>&1', shell=True)
 
 
 class Calculator:
@@ -317,7 +309,7 @@ class Sinoptik:
 
     def __init__(self, commandline):
         self.commandline = commandline
-        self.split_commandline = commandline.split()
+        # self.split_commandline = commandline.split()
 
     @classmethod
     def get_week_day(cls, number: int) -> int:
@@ -326,24 +318,17 @@ class Sinoptik:
         return date.isoweekday(datetime.date.today() + datetime.timedelta(days=number))
 
     def get_url(self) -> str:
-        for word in self.split_commandline:
-            for key in self.cities:
-                if key in word:
-                    talk(random.choice(dg.answer_ok))
-
-                    return f'{self.site_url}/погода-{self.cities[key]}'
-
+        for key in self.cities:
+            if key in self.commandline:
+                return f'{self.site_url}/погода-{self.cities[key]}'
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self) -> None:
-        if not ss.check_internet():
-            return
-
         from datetime import date, datetime as dt
         from tabulate import tabulate as tb
 
         url_weather_city = self.get_url()
-        if not url_weather_city:
+        if not url_weather_city or not ss.check_internet():
             return
 
         current_date = date.today()
@@ -356,6 +341,7 @@ class Sinoptik:
                 talk('Упс! Целевой сервер не отвечает.')
                 return
 
+            talk(random.choice(dg.answer_ok))
             soup = BeautifulSoup(r.text, 'html.parser')
             temp = soup.find('p', class_="today-temp").text
             description = soup.find('div', class_="description").text
@@ -378,14 +364,12 @@ class Sinoptik:
                 ['Min°C', min_temps[0], min_temps[1], min_temps[2],
                  min_temps[3], min_temps[4], min_temps[5], min_temps[6]],
                 ['Max°C', max_temps[0], max_temps[1], max_temps[2],
-                 max_temps[3], max_temps[4], max_temps[5], max_temps[6]]
-            ]
+                 max_temps[3], max_temps[4], max_temps[5], max_temps[6]]]
             col_names = [
                 "Day", self.weekdays[current_weekday], self.weekdays[self.get_week_day(1)],
                 self.weekdays[self.get_week_day(2)], self.weekdays[self.get_week_day(3)],
                 self.weekdays[self.get_week_day(4)], self.weekdays[self.get_week_day(5)],
-                self.weekdays[self.get_week_day(6)]
-            ]
+                self.weekdays[self.get_week_day(6)]]
 
             daily_temp = []
             [daily_temp.append(t[1:]) for t in temps]

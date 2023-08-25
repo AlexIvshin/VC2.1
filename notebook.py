@@ -2,7 +2,8 @@
 
 import os
 from dialog import notebook_action_dict, yes_no_dict
-from assistant import Voice, stack
+from assistant import stack
+from model_voice import Voice
 from skills import File
 from typing import Union
 from wordstonum import word2num_ru as w2n

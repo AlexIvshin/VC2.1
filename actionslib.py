@@ -9,7 +9,7 @@ import dialog as dg
 import skills
 import support_skills as ss
 
-from assistant import Voice
+from model_voice import Voice
 talk = Voice().speaks
 
 homedir = os.getcwdb().decode(encoding='utf-8')

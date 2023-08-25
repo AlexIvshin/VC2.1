@@ -5,16 +5,19 @@
 ###############################################################
 
 import argparse
-import configparser
-import pathlib
 import sys
-from subprocess import run
 import time
 import json as js
 import queue
 
 import sounddevice as sd
 from vosk import Model, KaldiRecognizer, SetLogLevel
+
+import support_skills as ss
+import actionslib as alib
+from dialog import on_off_dict, yes_no_dict, actions_dict
+from skills import Translators, ProgramManager
+from model_voice import Voice
 
 mode = 'default'
 
@@ -51,7 +54,10 @@ class Listener:
             q.put(bytes(indata))
 
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument("-l", "--list-devices", action="store_true", help="show list of audio devices and exit")
+        parser.add_argument(
+            "-l", "--list-devices",
+            action="store_true",
+            help="show list of audio devices and exit")
         args, remaining = parser.parse_known_args()
 
         if args.list_devices:
@@ -100,73 +106,38 @@ class Listener:
                         print(f'-infolabele-runtime{end}s', end='')
 
 
-class Voice:
-    config_path = pathlib.Path(__file__).parent.absolute() / "settings.ini"
-    config = configparser.ConfigParser()
-    config.read(config_path)
-
-    @classmethod
-    def mic_sensitivity(cls, value: int) -> None:
-        run(f'amixer -D pulse sset Capture {value}% >/dev/null', shell=True)
-
-    def speaks(self, words, print_str='',
-               speech_pitch: int = config['Speech']['speech_pitch'],
-               speech_rate: int = config['Speech']['speech_rate'],
-               voice_profile: str = config['Speech']['voice_profile'],
-               quality: str = config['Speech']['quality'],
-               mic_up: int = config['Mic']['mic_up']) -> None:
-
-        def voice(text) -> None:
-            if print_str:
-                print(f'{print_str}')
-            print(f'► {words.lstrip().replace("́", "")}')
-            self.mic_sensitivity(0)
-            run(f'echo {text} | RHVoice-test -q {quality} -r {speech_rate} '
-                f'-t {speech_pitch} -p {voice_profile} 2>/dev/null',
-                shell=True)
-            time.sleep(0.05)
-            self.mic_sensitivity(mic_up)
-
-        return voice(words)
-
-
 class Reactor:
-    import support_skills as ss
-    import actionslib as alib
-    from dialog import on_off_dict, yes_no_dict, actions_dict
 
     def __init__(self, command):
-        self.command = command
+        self.cmd = command
 
     def check_mode(self) -> str:
         global mode
-        mode = self.ss.choice_mode(self.command, var_mode=mode)  # Переопределение режима
+        mode = ss.choice_mode(self.cmd, var_mode=mode)  # Переопределение режима
 
-        if 'translator' in mode:
-            from skills import Translators
-            if mode == self.ss.translator_mode:
-                Translators(self.command).get_result()
-            if mode == self.ss.reverse_mode:
-                Translators(self.command, reverse=True).get_result()
-
-        if mode == self.ss.notebook_mode:
+        if mode == ss.translator_mode:
+            Translators(self.cmd).get_result()
+        if mode == ss.reverse_mode:
+            Translators(self.cmd, reverse=True).get_result()
+        if mode == ss.notebook_mode:
             from notebook import notebook_reacts
-            notebook_reacts(self.command)
+            notebook_reacts(self.cmd)
+
         return mode
 
     def get_foo_name(self) -> None:
+
         if self.check_mode() == 'sleep':
             return
 
-        on_off = self.ss.check_yesno_onoff(self.command, dictionary=self.on_off_dict)  # Определение вкл/выкл
-        yes_no = self.ss.check_yesno_onoff(self.command, dictionary=self.yes_no_dict)  # Определение да/нет
-        program = self.ss.check_prg(self.command)  # Определение имени программы, если таковая есть в команде
-        action = self.ss.choice_action(self.command, self.actions_dict)
+        on_off = ss.check_yesno_onoff(self.cmd, dictionary=on_off_dict)  # Определение вкл/выкл
+        yes_no = ss.check_yesno_onoff(self.cmd, dictionary=yes_no_dict)  # Определение да/нет
+        program = ss.check_prg(self.cmd)  # Определение имени программы, если таковая есть в команде
+        action = ss.choice_action(self.cmd, actions_dict)
 
         if program and on_off:
-            from skills import Translators, ProgramManager
             ProgramManager(program, on_off).start_stop_program()
         if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
-            self.alib.yesno_action(yes_no)
+            alib.yesno_action(yes_no)
         if action:  # выбор реакций модели на команды
-            self.alib.callfunc(self.command, action, onoff=on_off)
+            alib.callfunc(self.cmd, action, onoff=on_off)

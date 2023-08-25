@@ -6,7 +6,7 @@ import random
 
 import dialog as dg
 
-from assistant import Voice
+from model_voice import Voice
 talk = Voice().speaks
 
 # Режимы и команды смены режима, используются в choice_mode()
