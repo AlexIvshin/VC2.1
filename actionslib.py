@@ -49,9 +49,7 @@ def call_reboot_down(action: str) -> None:
 
 def callfunc(command_line: str, action: str, onoff=None) -> None:
     global function, cmdline, on_off
-    cmdline = command_line
-    function = action
-    on_off = onoff
+    function, cmdline, on_off = action, command_line, onoff
     return start_script(function) if 'start_script' in function else globals()[function]()
 
 
@@ -64,8 +62,8 @@ def thanks_output() -> None:
 
 
 def i_am_output() -> None:
-    if (len(cmdline.split(' ')) < 4
-            and ss.check_word_sequence(cmdline, ss.get_intersection_word(function, cmdline, dg.actions_dict))):
+    sequence = ss.check_word_sequence(cmdline, ss.get_intersection_word(function, cmdline, dg.actions_dict))
+    if len(cmdline.split(' ')) < 4 and sequence:
         return talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
 
 
