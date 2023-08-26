@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from subprocess import run
+from subprocess import run, CompletedProcess
 import tkinter as tk
 from contextlib import redirect_stdout
 from threading import Thread
@@ -25,31 +25,35 @@ class TextWrapper:
         self.label_field = label_field
         self.info_label_field = info_label_field
 
-    def get_output(self, text: str) -> None:
-        input_color = '#99ff66'
-        output_color = '#66b3ff'
+    def get_output(self, text: str) -> CompletedProcess[bytes]:
+
+        def set_color_text() -> tuple[str, str, str]:
+            input_color = '#99ff66'
+            output_color = '#66b3ff'
+            r_tag = w_tag = col = ''
+            if '◄' in text:
+                r_tag, w_tag, col = 'output', 'input', input_color
+            elif '►' in text:
+                r_tag, w_tag, col = 'input', 'output', output_color
+            return r_tag, w_tag, col
 
         if 'Перезагружаюсь!' in text:
             self.text_field.delete(1.0, 'end')
-            run(f'python3 start_app.py &', shell=True)
+            return run(f'python3 start_app.py &', shell=True)
 
         if 'очист' in text.lower() and 'экран' in text:
             self.text_field.delete(1.0, 'end')
 
         if 'Mode:' in text:
             self.label_field.configure(text=f'{title_app} • {text}')
-
         elif '-infolabele-' in text:
             sys_info_string = ''
             string = text.replace('-infolabele-', '')
-
             if 'Core' in text:
                 sys_info_string = string
-
             if 'runtime' in text and 'Core' in self.info_label_field['text']:
                 runtime = string.replace('runtime', '')
                 sys_info_string = self.info_label_field['text'].replace('no process', runtime)
-
             self.info_label_field.configure(text=sys_info_string)
 
         else:
@@ -58,13 +62,7 @@ class TextWrapper:
             self.text_field.see('end')
             self.text_field.tag_add('input', index_str, 'end')
             self.text_field.tag_add('output', index_str, 'end')
-
-            rm_tag = work_tag = color = ''
-            if '◄' in text:
-                rm_tag, work_tag, color = 'output', 'input', input_color
-            elif '►' in text:
-                rm_tag, work_tag, color = 'input', 'output', output_color
-
+            rm_tag, work_tag, color = set_color_text()
             self.text_field.tag_remove(rm_tag, index_str, 'end')
             self.text_field.tag_config(work_tag, foreground=color)
 

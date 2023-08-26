@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
+import datetime
+from datetime import date, datetime as dt
+from googletrans import Translator
+from tabulate import tabulate as tb
 import os
 import random
+import randfacts
 import re
 import requests
 from subprocess import run, check_output, call, CompletedProcess
@@ -63,18 +68,17 @@ class Calculator:
     def get_calc_elem(self) -> tuple[float | int, str | None, float | int] | tuple[None, None, None]:
         opers: dict = {
             'плюс': '+', 'минус': '-', 'отнять': '-', 'умножить на': '*', 'множить на': '*',
-            'разделить на': '/', 'раздели на': '/', 'дели на': '/', 'делить на': '/'
-        }
+            'разделить на': '/', 'раздели на': '/', 'дели на': '/', 'делить на': '/'}
         calc_string = w2n(self.cmd, otherwords=True).split()
-        interval: list = []
+        nums_index: list = []
         for i in calc_string:
             try:
-                interval.append(calc_string.index(i)) if float(i) else None
+                nums_index.append(calc_string.index(i)) if float(i) else None
             except ValueError:
                 pass
-        if len(interval) == 2:
-            n1, n2 = self.check_type_num(calc_string[interval[0]]), self.check_type_num(calc_string[interval[1]])
-            opr_str = ' '.join(calc_string[interval[0] + 1:interval[1]])
+        if len(nums_index) == 2:
+            n1, n2 = self.check_type_num(calc_string[nums_index[0]]), self.check_type_num(calc_string[nums_index[1]])
+            opr_str = ' '.join(calc_string[nums_index[0] + 1:nums_index[1]])
             operator: str = opers[opr_str] if opr_str in opers.keys() else None
             if operator:
                 return n1, operator, n2
@@ -309,12 +313,9 @@ class Sinoptik:
 
     def __init__(self, commandline):
         self.commandline = commandline
-        # self.split_commandline = commandline.split()
 
     @classmethod
     def get_week_day(cls, number: int) -> int:
-        import datetime
-        from datetime import date
         return date.isoweekday(datetime.date.today() + datetime.timedelta(days=number))
 
     def get_url(self) -> str:
@@ -324,9 +325,6 @@ class Sinoptik:
         talk('Не поняла, погода в каком городе?')
 
     def get_weather_forecast(self) -> None:
-        from datetime import date, datetime as dt
-        from tabulate import tabulate as tb
-
         url_weather_city = self.get_url()
         if not url_weather_city or not ss.check_internet():
             return
@@ -414,10 +412,6 @@ class Polyhistor:
     def get_fact() -> Optional[Any]:
         if not ss.check_internet():
             return
-
-        import randfacts
-        from googletrans import Translator
-
         f = randfacts.get_fact(False)
         tr = Translator()
         fact = tr.translate(f, dest='ru')
@@ -443,8 +437,8 @@ class Polyhistor:
 
             talk(result, speech_rate=100)
             time.sleep(0.2)
-            if 'поговорк' not in self.commandline:
-                talk(random.choice(dg.qustion_replay))
+            talk(random.choice(dg.qustion_replay))
+
         except requests.exceptions.ConnectionError:
             talk('Упс! Что-то не так пошло! Скорее всего сеть отсутствует.')
 
@@ -496,7 +490,6 @@ class ExchangeRates:
     def get_exchange_rates(self) -> None:
         if not ss.check_internet():
             return
-        from datetime import datetime as dt
 
         current_date = dt.today().strftime('%d-%m-%Y %H:%M:%S')
         currency_key, currency = self.determine_the_currency()
@@ -569,8 +562,6 @@ class Translators:
 
     @staticmethod
     def get_google_translate(string: str, lang: str) -> str:
-        from googletrans import Translator
-
         try:
             tr = Translator()
             result = tr.translate(string, dest=lang)

@@ -14,7 +14,7 @@ import sounddevice as sd
 from vosk import Model, KaldiRecognizer, SetLogLevel
 
 import support_skills as ss
-import actionslib as alib
+from actionslib import yesno_action, callfunc
 from dialog import on_off_dict, yes_no_dict, actions_dict
 from skills import Translators, ProgramManager
 from model_voice import Voice
@@ -94,6 +94,7 @@ class Listener:
 
             while True:
                 data = q.get()
+
                 if rec.AcceptWaveform(data):
                     result = rec.Result()
                     text = js.loads(result)['text']
@@ -114,7 +115,6 @@ class Reactor:
     def check_mode(self) -> str:
         global mode
         mode = ss.choice_mode(self.cmd, var_mode=mode)  # Переопределение режима
-
         if mode == ss.translator_mode:
             Translators(self.cmd).get_result()
         if mode == ss.reverse_mode:
@@ -122,7 +122,7 @@ class Reactor:
         if mode == ss.notebook_mode:
             from notebook import notebook_reacts
             notebook_reacts(self.cmd)
-
+        print(f'Mode: {mode.capitalize()}', end='')
         return mode
 
     def get_foo_name(self) -> None:
@@ -138,6 +138,6 @@ class Reactor:
         if program and on_off:
             ProgramManager(program, on_off).start_stop_program()
         if yes_no:  # обработка моих ответов (да или нет) на вопрос модели
-            alib.yesno_action(yes_no)
+            yesno_action(yes_no)
         if action:  # выбор реакций модели на команды
-            alib.callfunc(self.cmd, action, onoff=on_off)
+            callfunc(self.cmd, action, onoff=on_off)

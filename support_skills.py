@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
+
 from subprocess import check_output, call
 import sys
 import random
@@ -125,6 +125,7 @@ def check_internet() -> bool:  # internet check feature
     host = '8.8.8.8'
     port = 53
     timeout = 3
+
     try:
         socket.setdefaulttimeout(timeout)
         socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
@@ -135,50 +136,39 @@ def check_internet() -> bool:  # internet check feature
         return False
 
 
-def choice_mode(change_mode_cmd: str, var_mode='default') -> str:
+def choice_mode(change_mode_cmd: str, var_mode) -> str:
     mode = var_mode
+
+    def say_mode():
+        if change_mode_cmd == notebook_cmd:
+            talk('Режим блокнота активирован!')
+        if change_mode_cmd == translator_cmd:
+            talk('Переводчик активирован!')
+        if change_mode_cmd == sleep_cmd:
+            talk('Засыпаю...')
+        if change_mode_cmd == default_cmd:
+            talk('Обычный режим активирован!')
+        if change_mode_cmd == wakeup_cmd:
+            talk('Я снова в деле!')
 
     if (mode != sleep_mode and change_mode_cmd == notebook_cmd
             or mode == notebook_mode and change_mode_cmd != default_cmd):
-        if change_mode_cmd == notebook_cmd:
-            talk('Режим блокнота активирован!')
-        print('Mode: Notebook', end='')
         mode = notebook_mode
 
     if (mode != sleep_mode and change_mode_cmd == translator_cmd
             or mode == translator_mode and change_mode_cmd != default_cmd
             or mode == reverse_mode and change_mode_cmd != default_cmd
             or change_mode_cmd == reverse_cmd):
-
         if change_mode_cmd == translator_cmd:
-            talk('Переводчик активирован!')
             mode = translator_mode
-
-        if mode == translator_mode and change_mode_cmd == reverse_cmd:
-            mode = reverse_mode
-        elif mode == reverse_mode and change_mode_cmd == reverse_cmd:
-            mode = translator_mode
-
-        if mode == translator_mode:
-            print('Mode: Translator', end='')
-        if mode == reverse_mode:
-            print('Mode: Translitor-reverse', end='')
+        if change_mode_cmd == reverse_cmd:
+            mode = reverse_mode if mode == translator_mode else translator_mode
 
     if change_mode_cmd == sleep_cmd or mode == sleep_mode:
-        if change_mode_cmd == sleep_cmd:
-            talk('Засыпаю...')
-        os.system('clear')
-        print('Mode: Sleep...!', end='')
         mode = sleep_mode
 
-    if (change_mode_cmd == default_cmd and mode != sleep_mode
-            or change_mode_cmd == wakeup_cmd):
-        talk('Обычный режим активирован!')
-
-        if change_mode_cmd == wakeup_cmd:
-            talk('Я снова в деле!')
-
-        print('Mode: Default', end='')
+    if change_mode_cmd == default_cmd and mode != sleep_mode or change_mode_cmd == wakeup_cmd:
         mode = default_mode
 
+    say_mode()
     return mode
