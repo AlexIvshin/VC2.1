@@ -4,46 +4,48 @@ import os
 import random
 import sys
 from subprocess import run
+from typing import Any
 
+# Модули приложения
 import dialog as dg
+from model_voice import Voice
 import skills
 import support_skills as ss
 
-from model_voice import Voice
 talk = Voice().speaks
-
 homedir = os.getcwdb().decode(encoding='utf-8')
 scriptdir: str = f'{homedir}/scripts/'
-
 last_function = last_cmdline = ''
 global cmdline, function, on_off
 
 
-def yesno_action(yesno: str) -> None:
+def yesno_action(yesno: str) -> Any:
     global last_function, last_cmdline
 
     if yesno == 'yes' and last_function and last_cmdline:
-        globals()[last_function]()
-    elif yesno == 'no':
+        return globals()[last_function]()
+    if yesno == 'no':
         last_function = last_cmdline = ''
+    return
 
 
 def confirm_action(foo_name: str) -> None:
     global last_cmdline, last_function
     last_function, last_cmdline = foo_name, cmdline
-    return talk(f'Вы уверены?')
+    return talk(random.choice(dg.qustion_confirmation))
 
 
 def call_reboot_down(action: str) -> None:
-    def execute_command(cmd):
+    def execute_command(cmd: str) -> None:
         ss.answer_ok_and_pass()
         run(cmd, shell=True)
         sys.exit()
 
     if last_function == action == 'sys_down':
         return execute_command('systemctl poweroff')
-    elif last_function == action == 'sys_reboot':
+    if last_function == action == 'sys_reboot':
         return execute_command('systemctl reboot')
+
     return confirm_action(action)
 
 

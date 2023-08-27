@@ -3,25 +3,25 @@
 from bs4 import BeautifulSoup
 import datetime
 from datetime import date, datetime as dt
+import GPUtil
 from googletrans import Translator
-from tabulate import tabulate as tb
 import os
+import psutil
 import random
 import randfacts
 import re
 import requests
 from subprocess import run, check_output, call, CompletedProcess
+from tabulate import tabulate as tb
 import time
-import GPUtil
-import psutil
-
 from typing import Union, Optional, Any
 
-from model_voice import Voice
+# Модули приложения
 import dialog as dg
-from wordstonum import word2num_ru as w2n
+from model_voice import Voice
 import support_skills as ss
 from widgets.hand_input_widget import get_input
+from wordstonum import word2num_ru as w2n
 
 talk = Voice().speaks
 mic_sins = Voice().mic_sensitivity

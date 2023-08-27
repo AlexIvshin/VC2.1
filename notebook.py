@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+from typing import Union
+
+# Модули приложения
 from dialog import notebook_action_dict, yes_no_dict
 from assistant import stack
 from model_voice import Voice
 from skills import File
-from typing import Union
+
 from wordstonum import word2num_ru as w2n
 import support_skills as ss
 
@@ -22,7 +25,7 @@ action: str = ''
 
 def files_list() -> bool:
     files = os.listdir(note_dir)
-    print(note_dir)
+    print(f' {note_dir}')
 
     if not files:
         talk('Файлы не обнаружены.')
@@ -47,7 +50,7 @@ def notebook_reacts(commandline: str) -> None:
         file = ''
         return stack.clear_stack()
 
-    print(f'Выбран файл: "{file}"') if file else None
+    print(f'  Выбран файл: "{file}"') if file else None
 
     if action:
         stack.ad_element(action)
@@ -67,7 +70,7 @@ def notebook_reacts(commandline: str) -> None:
 
 
 def file_existence(function) -> ():
-    def wrapper():
+    def wrapper() -> None | str | list[str]:
         if not file:
             return choice_file()
         function()
@@ -75,7 +78,7 @@ def file_existence(function) -> ():
 
 
 def file_existence_and_clear_stack(function) -> ():
-    def wrapper():
+    def wrapper() -> None:
         file_existence(function)
         stack.clear_stack()
     return wrapper
@@ -92,7 +95,7 @@ def choice_file(num=None) -> Union[None, str, list[str]]:
     try:
         if num and 0 < int(num) <= len(files):
             file = files[num - 1]
-            print(f'Выбран файл: {file}')
+            print(f'  Выбран файл: {file}')
             return file
 
     except (ValueError, IndexError):

@@ -13,6 +13,7 @@ import queue
 import sounddevice as sd
 from vosk import Model, KaldiRecognizer, SetLogLevel
 
+# Модули приложения
 import support_skills as ss
 from actionslib import yesno_action, callfunc
 from dialog import on_off_dict, yes_no_dict, actions_dict
