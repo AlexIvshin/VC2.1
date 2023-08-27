@@ -49,18 +49,28 @@ class Listener:
         SetLogLevel(-1)
         q = queue.Queue()
 
-        def callback(indata, _frames, _time, status):
+        def callback(indata, _frames, _time, status) -> None:
             if status:
                 print(status, file=sys.stderr)
             q.put(bytes(indata))
+
+        def get_output(function) -> None:
+            if len(text) <= 1:
+                return
+            print('◄ ' + text.capitalize())
+            start = time.time()
+            function()
+            end = str(round(time.time() - start, 4))
+            print(f'-infolabele-runtime{end}s', end='')
 
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument(
             "-l", "--list-devices",
             action="store_true",
-            help="show list of audio devices and exit")
-        args, remaining = parser.parse_known_args()
+            help="show list of audio devices and exit"
+        )
 
+        args, remaining = parser.parse_known_args()
         if args.list_devices:
             print(sd.query_devices())
             parser.exit()
@@ -68,7 +78,8 @@ class Listener:
         parser = argparse.ArgumentParser(
             description=__doc__,
             formatter_class=argparse.RawDescriptionHelpFormatter,
-            parents=[parser])
+            parents=[parser]
+        )
         parser.add_argument("-d", "--device", help="input device (numeric ID or substring)")
         parser.add_argument("-r", "--samplerate", type=int, help="sampling rate")
         args = parser.parse_args(remaining)
@@ -91,21 +102,12 @@ class Listener:
 
             talk = Voice().speaks
             talk('Я в деле!')
-            print('Mode: Default')
 
             while True:
                 data = q.get()
-
                 if rec.AcceptWaveform(data):
-                    result = rec.Result()
-                    text = js.loads(result)['text']
-
-                    if len(text) > 1:
-                        print('◄ ' + text.capitalize())
-                        start = time.time()
-                        Reactor(text).get_foo_name()
-                        end = str(round(time.time() - start, 4))
-                        print(f'-infolabele-runtime{end}s', end='')
+                    text = js.loads(rec.Result())['text']
+                    get_output(Reactor(text).get_foo_name)
 
 
 class Reactor:
@@ -114,15 +116,17 @@ class Reactor:
         self.cmd = command
 
     def check_mode(self) -> str:
+        from notebook import notebook_reacts
         global mode
         mode = ss.choice_mode(self.cmd, var_mode=mode)  # Переопределение режима
+
         if mode == ss.translator_mode:
             Translators(self.cmd).get_result()
         if mode == ss.reverse_mode:
             Translators(self.cmd, reverse=True).get_result()
         if mode == ss.notebook_mode:
-            from notebook import notebook_reacts
             notebook_reacts(self.cmd)
+
         print(f'Mode: {mode.capitalize()}', end='')
         return mode
 

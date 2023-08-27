@@ -1,9 +1,10 @@
-import sys
-import tkinter as tk
-
 import configparser
+import sys
 import pathlib
+import tkinter as tk
+from typing import Any
 
+# Модули приложения
 from dialog import title_app
 
 config_path = pathlib.PurePosixPath(pathlib.Path(__file__).parent.absolute()).parent / "settings.ini"
@@ -59,10 +60,10 @@ class AppWidget:
     info_label.pack(expand=True, fill='x')
 
     @classmethod
-    def close_widget(cls) -> None:
+    def close_widget(cls) -> Any:
         cls.root.quit()
         try:
             cls.root.destroy()
         except RuntimeError:
             pass
-        sys.exit()
+        return sys.exit()
