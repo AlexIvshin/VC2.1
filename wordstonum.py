@@ -1,3 +1,10 @@
+
+"""
+function to form numeric multipliers for million, billion, thousand etc.
+input: list of strings
+return value: integer
+"""
+
 import re
 
 russian_number_system = {
@@ -161,12 +168,6 @@ russian_number_system = {
     'целая': '.'
 }
 
-'''
-function to form numeric multipliers for million, billion, thousand etc.
-input: list of strings
-return value: integer
-'''
-
 
 def number_formation(number_words):
     numbers = []
@@ -182,27 +183,24 @@ def number_formation(number_words):
         return numbers[0]
 
 
-"""
-function to convert post decimal digit words to numerial digits
-input: list of strings
-output: double
-"""
-
-
 def get_decimal_sum(decimal_digit_words):
+    """
+    function to convert post decimal digit words to numerial digits
+    input: list of strings
+    output: double
+    """
     decimal_number_str = word_to_num(' '.join(decimal_digit_words))
     final_decimal_string = '0.' + str(decimal_number_str)
     return float(final_decimal_string)
 
 
-"""
-function to return integer for an input `number_sentence` string
-input: string
-output: int or double or None
-"""
-
-
 def word_to_num(number_sentence):
+    """
+    function to return integer for an input `number_sentence` string
+    input: string
+    output: int or double or None
+    """
+
     if type(number_sentence) is not str:
         raise ValueError("Type of input is not string! Please enter a valid number word"
                          " (eg. \'two million twenty three thousand and forty nine\')")
