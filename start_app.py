@@ -76,12 +76,12 @@ class TextWrapper:
 
 
 def check_run_scr() -> None:
-    global run_flag, num_scr_to_run
-    run_scripts = []
     """
     This function monitors the execution of scripts in the XTERM.
     Эта функция мониторит выполнение скриптов в XTERM.
     """
+    global run_flag, num_scr_to_run
+    run_scripts = []
 
     def report_completion() -> None:
         talk = Voice().speaks
@@ -101,14 +101,14 @@ def check_run_scr() -> None:
 
 
 def thread_monitoring() -> None:
-    sysmonitor = SysInformer()
-    __interval = 2
     """
     This function in a loop with an interval of 2 sec monitors the main thread "tread",
     and if it is interrupted, closes the main widget, and monitors the system and the execution of bash scripts.
     Эта функция в цикле с интервалом 2 сек следит за главным потоком tread, и если он прерван,
     закрывает главный виджет, а также мониторится система и исполнение bash-скриптов.
     """
+    sysmonitor = SysInformer()
+    __interval = 2
 
     while thread.is_alive():
         check_run_scr()
