@@ -117,6 +117,7 @@ class Reactor:
 
     def check_mode(self) -> str:
         from notebook import notebook_reacts
+
         global mode
         mode = ss.choice_mode(self.cmd, var_mode=mode)  # Переопределение режима
 
@@ -131,7 +132,6 @@ class Reactor:
         return mode
 
     def get_foo_name(self) -> None:
-
         if self.check_mode() == 'sleep':
             return
 

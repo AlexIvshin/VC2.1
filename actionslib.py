@@ -15,23 +15,23 @@ import support_skills as ss
 talk = Voice().speaks
 homedir = os.getcwdb().decode(encoding='utf-8')
 scriptdir: str = f'{homedir}/scripts/'
-last_function = last_cmdline = ''
+last_function = ''
 global cmdline, function, on_off
 
 
 def yesno_action(yesno: str) -> Any:
-    global last_function, last_cmdline
+    global last_function
 
-    if yesno == 'yes' and last_function and last_cmdline:
+    if yesno == 'yes' and last_function:
         return globals()[last_function]()
     if yesno == 'no':
-        last_function = last_cmdline = ''
+        last_function = ''
     return
 
 
 def confirm_action(foo_name: str) -> None:
-    global last_cmdline, last_function
-    last_function, last_cmdline = foo_name, cmdline
+    global last_function
+    last_function = foo_name
     return talk(random.choice(dg.qustion_confirmation))
 
 
@@ -116,9 +116,9 @@ def volume_settings() -> None:
 
 
 def random_joke() -> None:
-    global last_cmdline, last_function
+    global last_function
     last_function = 'random_joke'
-    last_cmdline = cmdline
+    # last_cmdline = cmdline
     return skills.Polyhistor(cmdline).get_result()
 
 

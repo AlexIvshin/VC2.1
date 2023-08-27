@@ -750,10 +750,10 @@ class SysInformer:
 
     @staticmethod
     def sys_monitoring() -> None:
-        core_temp_warning = 90
-        core_temp_critical = 95
-        gpu_temp_warning = 93
-        gpu_temp_critical = 98
+        core_temp_warning = 95
+        core_temp_critical = 100
+        gpu_temp_warning = 98
+        gpu_temp_critical = 102
         ram_per_warning = 90
         ram_per_critical = 98
         gpus = GPUtil.getGPUs()
@@ -905,26 +905,26 @@ class Anonimizer:
 
         if not os.path.isfile(path_tor):
             talk('Тор в системе не обнаружен!')
-            print('Для установки Tor, выполнить: <sudo apt install tor>')
+            print('  Для установки Tor, выполнить: <sudo apt install tor>')
             return False
 
         if not os.path.isfile(path_iptables):
             talk('Айпи тэйбл в системе не обнаружен!')
-            print('Для установки iptables, выполнить: <sudo apt install iptables>')
+            print('  Для установки iptables, выполнить: <sudo apt install iptables>')
             return False
 
         if not os.path.isfile(path_toriptables2):
             talk('Тор айпи тэйбл в системе не обнаружен! Для установки, следуйте инструкции!')
-            print('Для установки toriptables2, выполнить в терминале:')
-            print('1) <git clone https://github.com/ruped24/toriptables2>')
-            print('2) <cd toriptables2/>')
-            print('3) <sudo mv toriptables2.py /usr/local/bin/>')
-            print('4) <cd>')
+            print('  Для установки toriptables2, выполнить в терминале:')
+            print('  1) <git clone https://github.com/ruped24/toriptables2>')
+            print('  2) <cd toriptables2/>')
+            print('  3) <sudo mv toriptables2.py /usr/local/bin/>')
+            print('  4) <cd>')
             return False
 
         if not os.path.isfile(path_python2):
             talk('Для работы скрипта необходим пайтон2!')
-            print('Выполнить в терминале: <sudo apt install python2>')
+            print('  Выполнить в терминале: <sudo apt install python2>')
             return False
 
         return True

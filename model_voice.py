@@ -21,7 +21,8 @@ class Voice:
                mic_up: int = config['Mic']['mic_up']) -> None:
 
         def voice(text) -> None:
-
+            if not text:
+                return
             if print_str:
                 print(f'{print_str}')
 
@@ -30,7 +31,6 @@ class Voice:
             run(f'echo {text} | RHVoice-test -q {quality} -r {speech_rate} '
                 f'-t {speech_pitch} -p {voice_profile}',
                 shell=True)
-            # time.sleep(0.01)
             self.mic_sensitivity(mic_up)
 
         return voice(words)
