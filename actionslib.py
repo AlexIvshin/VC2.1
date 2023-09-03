@@ -35,7 +35,7 @@ def confirm_action(foo_name: str) -> None:
     return talk(random.choice(dg.qustion_confirmation))
 
 
-def call_reboot_down(action: str) -> None:
+def call_confirm_action(action: str) -> None:
     def execute_command(cmd: str) -> None:
         ss.answer_ok_and_pass()
         run(cmd, shell=True)
@@ -79,7 +79,10 @@ def start_script(foo_str: str) -> None:
 
 
 def search() -> None:
-    return skills.SearchEngine(cmdline, function).get_result()
+    global last_function
+    check = True if last_function == function else False
+    last_function = '' if check else function
+    skills.SearchEngine(cmdline, function, check).get_result()
 
 
 def calculate() -> None:
@@ -100,11 +103,11 @@ def app_reboot() -> None:
 
 
 def sys_down() -> None:
-    return call_reboot_down('sys_down')
+    return call_confirm_action('sys_down')
 
 
 def sys_reboot() -> None:
-    return call_reboot_down('sys_reboot')
+    return call_confirm_action('sys_reboot')
 
 
 def conf_settings() -> None:
@@ -117,8 +120,7 @@ def volume_settings() -> None:
 
 def random_joke() -> None:
     global last_function
-    last_function = 'random_joke'
-    # last_cmdline = cmdline
+    last_function = function
     return skills.Polyhistor(cmdline).get_result()
 
 

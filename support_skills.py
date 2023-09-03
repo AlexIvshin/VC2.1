@@ -109,7 +109,8 @@ def answer_ok_and_pass(answer=True, enter_pass=False) -> None:
 
 def get_intersection_word(act: str, cmd: str, d: dict) -> list:
     isection_words = []
-    [isection_words.append(word) if word == i else None for i in cmd.split(' ') for word in d[act]]
+    [isection_words.append(word) if word == i and word not in isection_words
+     else None for i in cmd.split(' ') for word in d[act]]
     return isection_words
 
 

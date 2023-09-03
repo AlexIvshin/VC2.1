@@ -132,14 +132,17 @@ class SearchEngine:
     import wikipedia
     wikipedia.set_lang("ru")  # Установка русского языка для Википедии
 
-    def __init__(self, cmd, action):
+    def __init__(self, cmd, action, confirm):
         self.commandline = cmd
         self.action = action
+        self.confirm = confirm
         self.search_words = get_input() if ss.check_hand_input(cmd) else ss.get_meat(action, cmd, dg.actions_dict)
 
     def get_result(self) -> None:
         if not self.search_words or not ss.check_internet():
             return
+        if not self.confirm:
+            return talk(f'Искать {self.search_words}?')
 
         talk(random.choice(dg.answer_ok))
         print(f'  Ищу: "{self.search_words}"')
@@ -207,7 +210,7 @@ class SearchEngine:
             run(f'{ss.choice_xterm("XtermSearch")} echo "{title}{content}" &', shell=True)
             talk('Это всё, что удалось найти!')
 
-        except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError):
+        except (requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError, OSError):
             cls.exception_words()
         except (cls.wikipedia.exceptions.DisambiguationError, cls.wikipedia.exceptions.PageError):
             cls.exception_words(wiki_error=True)
@@ -318,26 +321,23 @@ class Sinoptik:
     def get_week_day(cls, number: int) -> int:
         return date.isoweekday(datetime.date.today() + datetime.timedelta(days=number))
 
-    def get_url(self) -> str:
+    def get_url(self) -> str | None:
         for key in self.cities:
             if key in self.commandline:
                 return f'{self.site_url}/погода-{self.cities[key]}'
         talk('Не поняла, погода в каком городе?')
+        return None
 
     def get_weather_forecast(self) -> None:
         url_weather_city = self.get_url()
         if not url_weather_city or not ss.check_internet():
             return
 
-        current_date = date.today()
-        current_weekday = int(date.isoweekday(current_date))
-
         try:
             r = requests.get(url_weather_city)
             if r.status_code != 200:
                 print(f'Status code: {r.status_code} !!!')
-                talk('Упс! Целевой сервер не отвечает.')
-                return
+                return talk('Упс! Целевой сервер не отвечает.')
 
             talk(random.choice(dg.answer_ok))
             soup = BeautifulSoup(r.text, 'html.parser')
@@ -363,6 +363,8 @@ class Sinoptik:
                  min_temps[3], min_temps[4], min_temps[5], min_temps[6]],
                 ['Max°C', max_temps[0], max_temps[1], max_temps[2],
                  max_temps[3], max_temps[4], max_temps[5], max_temps[6]]]
+
+            current_weekday = int(date.isoweekday(date.today()))
             col_names = [
                 "Day", self.weekdays[current_weekday], self.weekdays[self.get_week_day(1)],
                 self.weekdays[self.get_week_day(2)], self.weekdays[self.get_week_day(3)],
@@ -509,16 +511,13 @@ class ExchangeRates:
             exchange_rates: dict = {}
             len_banks_names: list = []
             count = 0
-
             while len(exchange_rates) <= 5:
                 buy = soup_buy[count].text
                 sale = soup_sale[0].text if count == 0 else soup_sale[count * 2].text
-
                 if buy and sale:
                     bank_name = soup_banks_names[count].text.replace('\n', '').strip()
                     len_banks_names.append(len(bank_name))
                     exchange_rates[bank_name] = {'buy': buy, 'sale': sale}
-
                 count += 1
 
             max_len_bank_name: int = max(len_banks_names)
@@ -539,7 +538,7 @@ class ExchangeRates:
             talk(f' Покупка: {self.get_correct_value_rate(buy)}. Продажа: {self.get_correct_value_rate(sale)}.')
 
         except requests.exceptions.ConnectionError:
-            print('Ups(')
+            print('Упс! Что-то не так пошло! Скорее всего сеть отсутствует.')
 
 
 class Translators:
@@ -549,40 +548,36 @@ class Translators:
 
     def check_language(self) -> tuple[str, str]:
         from_lang, to_lang = 'ru', 'en'
-        languages: dict = {'украинск': 'ukr', 'русск': 'ru', 'английск': 'en', 'немецк': 'de',
-                           'итальянск': 'it', 'французск': 'fr', 'испанск': 'es'}
-
+        languages: dict = {
+            'украинск': 'ukr', 'русск': 'ru', 'английск': 'en', 'немецк': 'de',
+            'итальянск': 'it', 'французск': 'fr', 'испанск': 'es'
+        }
         for lang in languages.keys():
             if f'с {lang}' in self.commandline:
                 from_lang = languages[lang]
             if f'на {lang}' in self.commandline:
                 to_lang = languages[lang]
-
         return from_lang, to_lang
 
     @staticmethod
-    def get_google_translate(string: str, lang: str) -> str:
+    def get_google_translate(string: str, lang: str) -> str | None:
         try:
             tr = Translator()
             result = tr.translate(string, dest=lang)
             return result.text.lower()
-
         except requests.exceptions.ConnectionError:
-            talk('Упс! Что-то не так пошло с Гуглом!')
-            return ':('
+            return talk('Упс! Что-то не так пошло с Гуглом!')
 
     @staticmethod
-    def get_tranlate(string, f_lang, t_lang) -> str:
+    def get_tranlate(string, f_lang, t_lang) -> str | None:
         from translate import Translator
 
         try:
             tr = Translator(from_lang=f_lang, to_lang=t_lang)
             result = tr.translate(string)
             return result.lower()
-
         except requests.exceptions.ConnectionError:
-            talk('Упс! Сервер не отвечает.')
-            return ':('
+            return talk('Упс! Сервер не отвечает.')
 
     def get_result(self) -> None:
         if not ss.check_internet():
