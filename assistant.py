@@ -22,7 +22,8 @@ from model_voice import Voice
 
 mode = 'default'
 
-# Модели на официальном сайте  https://alphacephei.com/vosk/models
+# Модели распознавания голоса на официальном сайте  https://alphacephei.com/vosk/models
+# Скачать и распаковать в папку проэкта.
 vosk_model = f'vosk-model-small-ru-0.22'  # Лёгкая ресурсонезатратная модель
 # vosk_model = f'vosk-model-ru-0.42'  # Большая и более точная модель распознавания голоса (для сервера)
 
