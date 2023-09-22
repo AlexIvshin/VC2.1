@@ -65,7 +65,7 @@ def thanks_output() -> None:
 
 def i_am_output() -> None:
     sequence = ss.check_word_sequence(cmdline, ss.get_intersection_word(function, cmdline, dg.actions_dict))
-    if len(cmdline.split(' ')) < 4 and sequence:
+    if len(cmdline.split()) < 4 and sequence:
         return talk(f'{random.choice(dg.i_answer)} {random.choice(dg.i_answer_other)}')
 
 
