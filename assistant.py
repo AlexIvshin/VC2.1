@@ -22,6 +22,10 @@ from model_voice import Voice
 
 mode = 'default'
 
+# Модели на официальном сайте  https://alphacephei.com/vosk/models
+vosk_model = f'vosk-model-small-ru-0.22'
+# vosk_model = f'vosk-model-ru-0.42'  # Большая и более точная модель распознавания голоса (для сервера)
+
 
 class ShortTermMemory:
     __limit: int = 2
@@ -97,7 +101,7 @@ class Listener:
             callback=callback
         ):
 
-            model = Model(f'vosk-model-small-ru-0.22')
+            model = Model(vosk_model)
             rec = KaldiRecognizer(model, args.samplerate)
 
             talk = Voice().speaks
