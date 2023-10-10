@@ -75,6 +75,6 @@ def take_screenshot(source: Any, path: str) -> None:
     cv2.destroyAllWindows()
 
 
-# take_screenshot(0, 'img/dataset/test')
-# extracting_faces('img/alex')
-encoding_face('img/ridly')
+# take_screenshot(0, 'img/alexei')
+# extracting_faces('img/alexei')
+encoding_face('img/alexei')
