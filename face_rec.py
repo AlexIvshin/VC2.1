@@ -1,5 +1,4 @@
-# import os
-
+import os
 import cv2
 import face_recognition as fr
 from typing import Any
@@ -107,9 +106,12 @@ def face_control(source: Any, puths_to_valid_faces: list) -> bool:
 
 
 def main():
-    # if face_control(0, os.getenv('VALID_FACE')):
-    valid_faces: list = ['img/alex/encoding_extract_5.pkl', 'img/ridly/encoding_ridly_2.pkl']
-    startapp() if face_control(0, valid_faces) else None
+    valid_faces: list = [
+        f'{os.getenv("VALID_FACE")}',
+        f'{os.getenv("FRIENDLY_FACE_1")}'
+    ]
+    # startapp() if face_control(0, valid_faces) else None
+    face_control(0, valid_faces)
 
 
 if __name__ == '__main__':
