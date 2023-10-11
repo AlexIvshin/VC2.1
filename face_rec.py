@@ -3,12 +3,16 @@
 
 import os
 import cv2
+
+# To install the package face_recognition for Debian kernel systems:
+# step 1. sudo apt-get install libboost-all-dev libgtk-3-dev build-essential cmake
+# step 2. pip install face_recognition
 import face_recognition as fr
+
 from typing import Any
 from pickle import load
-
 from model_voice import Voice
-# from start_app import startapp
+from start_app import startapp
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -97,7 +101,7 @@ def face_control(source: Any, puths_to_valid_faces: list) -> bool:
         cv2.imshow('Result', img_show)
         cnt += 1
 
-        if cv2.waitKey(waitkey) & 0xFF == ord('q') or cnt == 300:
+        if cv2.waitKey(waitkey) & 0xFF == ord('q') or cnt == 20:
             break
 
     cap.release()
@@ -107,8 +111,9 @@ def face_control(source: Any, puths_to_valid_faces: list) -> bool:
 
 
 def main():
-    # startapp() if face_control(0, valid_faces) else None
-    face_control(0, valid_faces)
+    if face_control(0, valid_faces):
+        startapp()
+    # face_control(0, valid_faces)
 
 
 if __name__ == '__main__':
