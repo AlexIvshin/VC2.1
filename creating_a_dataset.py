@@ -3,7 +3,7 @@ import cv2
 from PIL import Image
 import pickle
 
-# To install the package face_recognition:
+# To install the package face_recognition for Debian kernel systems:
 # step 1. sudo apt-get install libboost-all-dev libgtk-3-dev build-essential cmake
 # step 2. pip install face_recognition
 import face_recognition as fr
@@ -32,7 +32,6 @@ def extracting_faces(path_to_files: str) -> None:
 
 
 def encoding_face(path_to_files: str) -> None:
-
     files = os.listdir(path_to_files)
 
     for file in files:
@@ -47,7 +46,6 @@ def encoding_face(path_to_files: str) -> None:
 
 
 def take_screenshot(source: Any, path: str) -> None:
-
     path_to_dir = path
     os.mkdir(path_to_dir) if not os.path.exists(path_to_dir) else None
 
@@ -57,8 +55,8 @@ def take_screenshot(source: Any, path: str) -> None:
 
     while True:
         ret, img = cap.read()
-
         if not ret:
+            print('Error: Failed to get image!')
             break
 
         cv2.imshow('Result', img)
