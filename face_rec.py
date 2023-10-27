@@ -16,7 +16,10 @@ from start_app import startapp
 
 from dotenv import load_dotenv
 load_dotenv()
-valid_faces: list = [os.getenv("VALID_FACE"), os.getenv("FRIENDLY_FACE_1")]
+valid_faces: list = [
+    os.getenv("VALID_FACE"),
+    os.getenv("FRIENDLY_FACE_1")
+]
 valid_name = os.getenv("VALID_NAME")
 
 
@@ -111,9 +114,9 @@ def face_control(source: Any, puths_to_valid_faces: list) -> bool:
 
 
 def main():
-    # if face_control(0, valid_faces):
-    #     startapp()
-    face_control(0, valid_faces)
+    if face_control(0, valid_faces):
+        startapp()
+    # face_control(0, valid_faces)
 
 
 if __name__ == '__main__':
