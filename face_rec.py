@@ -111,9 +111,9 @@ def face_control(source: Any, puths_to_valid_faces: list) -> bool:
 
 
 def main():
-    if face_control(0, valid_faces):
-        startapp()
-    # face_control(0, valid_faces)
+    # if face_control(0, valid_faces):
+    #     startapp()
+    face_control(0, valid_faces)
 
 
 if __name__ == '__main__':

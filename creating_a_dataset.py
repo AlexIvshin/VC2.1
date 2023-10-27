@@ -74,9 +74,9 @@ def take_screenshot(source: Any, path: str) -> None:
 
 
 def main():
-    # take_screenshot(0, 'img/alexei')
-    # extracting_faces('img/alexei')
-    encoding_face('img/alexei')
+    # take_screenshot(0, 'img/aleksei')
+    # extracting_faces('img/aleksei')
+    encoding_face('img/aleksei')
 
 
 if __name__ == '__main__':
