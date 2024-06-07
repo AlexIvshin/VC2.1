@@ -755,43 +755,51 @@ class SysInformer:
     def sys_monitoring() -> None:
         core_temp_warning = 95
         core_temp_critical = 100
-        gpu_temp_warning = 98
-        gpu_temp_critical = 102
         ram_per_warning = 90
         ram_per_critical = 98
-        gpus = GPUtil.getGPUs()
-        cores_temps = []
-        gpus_temps = []
 
+        try:
+            gpu_temp_warning = 98
+            gpu_temp_critical = 102
+            gpus = GPUtil.getGPUs()
+            gpus_temps = []
+            [gpus_temps.append(gpu.temperature) for gpu in gpus]
+            gpu_temp: float = int(round(max(gpus_temps), 0))
+
+            # Следим за температурой графического ядра
+            if gpu_temp_warning <= gpu_temp < gpu_temp_critical:
+                talk(f'ВНИМАНИЕ! Температура графического ядра́ {gpu_temp}°!')
+            if gpu_temp >= gpu_temp_critical:
+                talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {gpu_temp}°!')
+
+        except ValueError:
+            gpu_temp: str = '??'
+
+        cores_temps = []
         [cores_temps.append(temp.current) for temp in psutil.sensors_temperatures()['coretemp']]
-        [gpus_temps.append(gpu.temperature) for gpu in gpus]
 
         ram_per_used: float = int(round(psutil.virtual_memory().percent, 0))
         swap_per_used: float = int(round(psutil.swap_memory().percent, 0))
         core_temp: float = int(round(max(cores_temps), 0))
-        gpu_temp: float = int(round(max(gpus_temps), 0))
 
         # Следим за оперативной памятью
         if ram_per_warning <= ram_per_used < ram_per_critical:
             talk(f'ВНИМАНИЕ! Оперативная память заполнена на {ram_per_used}%!')
         if ram_per_used >= ram_per_critical:
             talk(f'ВНИМАНИЕ! Критично! Оперативная память заполнена на {ram_per_used}%!')
+
         # Следим за swap-диском
         if swap_per_used:
             if ram_per_warning <= swap_per_used < ram_per_critical:
                 talk(f'ВНИМАНИЕ! Swap заполнен на {swap_per_used}%!')
             if swap_per_used >= ram_per_critical:
                 talk(f'ВНИМАНИЕ! Критично! Swap заполнен на {swap_per_used}%!')
+
         # Следим за температурой ядра
         if core_temp_warning <= core_temp < core_temp_critical:
             talk(f'ВНИМАНИЕ! Температура ядра́ {core_temp}°!')
         if core_temp >= core_temp_critical:
             talk(f'ВНИМАНИЕ! Критично! Температура ядра́ {core_temp}°!')
-        # Следим за температурой графического ядра
-        if gpu_temp_warning <= gpu_temp < gpu_temp_critical:
-            talk(f'ВНИМАНИЕ! Температура графического ядра́ {gpu_temp}°!')
-        if gpu_temp >= gpu_temp_critical:
-            talk(f'ВНИМАНИЕ! Критично! Температура графического ядра́ {gpu_temp}°!')
 
         swap_str = 'not used' if swap_per_used == 0 else f'{swap_per_used}%'
         print(f'-infolabele-■ Core temp: {core_temp}°  ■ GPU temp: {gpu_temp}°  ■ '
